@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+}
+
+html, body {
+  background: #F7F1E6;
+  color: #1B1B1B;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* Decorative paper / grain */
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 3px 3px;
+  z-index: 0;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #C8A24B 0%, #f7e3a1 50%, #C8A24B 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+
+.frame-polaroid {
+  background: white;
+  padding: 0.75rem 0.75rem 2.5rem 0.75rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08);
+  transform: rotate(var(--rot, -2deg));
+  transition: transform 0.3s ease;
+}
+.frame-polaroid:hover { transform: rotate(0deg) scale(1.02); }
+
+.frame-gold {
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #C8A24B, #f3d77a, #C8A24B);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.frame-gold > .inner { background: white; padding: 0.5rem; }
+
+.frame-vintage {
+  padding: 0.6rem;
+  background: #1B1B1B;
+  border: 4px double #C8A24B;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.6rem 1.1rem; border-radius: 9999px;
+  font-weight: 600; letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+}
+.btn-primary { background: #1B1B1B; color: #F7F1E6; }
+.btn-primary:hover { background: #7A1F2B; }
+.btn-gold { background: #C8A24B; color: #1B1B1B; }
+.btn-gold:hover { filter: brightness(1.05); }
+.btn-ghost { border: 1px solid rgba(0,0,0,0.2); }
+.btn-ghost:hover { background: rgba(0,0,0,0.05); }
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.input {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: white;
+}
+.input:focus { outline: 2px solid #C8A24B; outline-offset: 1px; }
+
+.label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; display: block; }
+
+main { position: relative; z-index: 1; }
+
+/* ===== Fund page · luxe progress ===== */
+.fund-hero {
+  position: relative;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 400px at 80% -20%, rgba(200,162,75,0.25), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(122,31,43,0.22), transparent 60%),
+    linear-gradient(160deg, #14110E 0%, #1B1B1B 55%, #2a1a1f 100%);
+  color: #F7F1E6;
+  box-shadow: 0 30px 80px -30px rgba(0,0,0,0.55), 0 8px 24px rgba(0,0,0,0.2);
+}
+.fund-hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 4px 4px;
+  pointer-events: none;
+}
+.fund-hero::after {
+  content: "";
+  position: absolute; inset: -2px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(200,162,75,0.6), rgba(255,255,255,0.05) 40%, rgba(122,31,43,0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+.gold-text {
+  background: linear-gradient(90deg, #f3d77a, #C8A24B 40%, #f7e3a1 70%, #C8A24B);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+
+.ring-track { stroke: rgba(255,255,255,0.08); }
+.ring-fill {
+  stroke: url(#fundGradient);
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 12px rgba(200,162,75,0.45));
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1);
+}
+
+.bar-track {
+  position: relative;
+  height: 14px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+}
+.bar-fill {
+  position: absolute; inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7A1F2B 0%, #C8A24B 60%, #f3d77a 100%);
+  box-shadow: 0 0 18px rgba(200,162,75,0.55);
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+}
+.bar-fill::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: translateX(-100%);
+  animation: barShine 2.6s ease-in-out infinite;
+}
+@keyframes barShine {
+  0% { transform: translateX(-100%); }
+  60%,100% { transform: translateX(200%); }
+}
+
+.milestone {
+  position: absolute;
+  top: 50%;
+  width: 2px; height: 22px;
+  background: rgba(255,255,255,0.35);
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+}
+.milestone-label {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(247,241,230,0.55);
+  white-space: nowrap;
+}
+
+.stat-chip {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  backdrop-filter: blur(6px);
+}
+
+.donor-row {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.donor-row:hover { background: rgba(200,162,75,0.06); transform: translateX(2px); }
+
+.rank-badge {
+  width: 2rem; height: 2rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.rank-1 { background: linear-gradient(135deg, #f3d77a, #C8A24B); color: #1B1B1B; }
+.rank-2 { background: linear-gradient(135deg, #e5e5e5, #a8a8a8); color: #1B1B1B; }
+.rank-3 { background: linear-gradient(135deg, #d8a06a, #8a5a2a); color: #1B1B1B; }
+.rank-x { background: rgba(0,0,0,0.06); color: #1B1B1B; }
+
