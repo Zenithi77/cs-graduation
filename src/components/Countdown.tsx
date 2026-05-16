@@ -17,6 +17,21 @@ function diff(target: Date) {
   };
 }
 
+function Cell({ v, l }: { v: number; l: string }) {
+  const text = String(v).padStart(2, "0");
+  return (
+    <div className="cd-cell text-center">
+      <div className="font-display text-4xl md:text-6xl text-ink leading-none [perspective:600px]">
+        {/* key on text triggers the flip animation each tick */}
+        <span key={text} className="cd-num">{text}</span>
+      </div>
+      <div className="mt-2 text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-black/55">
+        {l}
+      </div>
+    </div>
+  );
+}
+
 export default function Countdown() {
   const target = new Date(GRADUATION_DATE_ISO);
   const [t, setT] = useState(() => ({
@@ -33,34 +48,33 @@ export default function Countdown() {
     return () => clearInterval(id);
   }, []);
 
-  const Cell = ({ v, l }: { v: number; l: string }) => (
-    <div className="card px-5 py-4 md:px-7 md:py-6 text-center min-w-[78px] md:min-w-[110px] animate-floaty">
-      <div className="font-display text-4xl md:text-6xl text-ink leading-none">
-        {String(v).padStart(2, "0")}
-      </div>
-      <div className="mt-1 text-[10px] md:text-xs uppercase tracking-[0.25em] text-black/60">{l}</div>
-    </div>
-  );
-
   return (
-    <div className="text-center">
-      <div className="text-xs md:text-sm uppercase tracking-[0.3em] text-black/50">{GRADUATION_LABEL}</div>
-      <h2 className="font-display text-3xl md:text-5xl mt-2 inline-flex items-center justify-center gap-3">
+    <div className="text-center relative">
+      <div className="text-[11px] md:text-sm uppercase tracking-[0.4em] text-black/50">
+        {GRADUATION_LABEL}
+      </div>
+      <h2 className="font-display text-3xl md:text-5xl mt-3 inline-flex items-center justify-center gap-3">
         {t.done ? (
           <>
             Бид төгслөө
             <GraduationCap className="w-8 h-8 md:w-10 md:h-10 text-gold" aria-hidden />
           </>
         ) : (
-          "Төгсөлт хүртэл"
+          <>Төгсөлт хүртэл <span className="gold-text">үлдсэн</span></>
         )}
       </h2>
 
       {!t.done && (
-        <div className="mt-7 flex items-center justify-center gap-3 md:gap-5" suppressHydrationWarning>
+        <div
+          className="mt-8 flex items-center justify-center gap-2 md:gap-4 flex-wrap"
+          suppressHydrationWarning
+        >
           <Cell v={t.days} l="өдөр" />
+          <span className="cd-colon hidden sm:inline">:</span>
           <Cell v={t.hours} l="цаг" />
+          <span className="cd-colon hidden sm:inline">:</span>
           <Cell v={t.minutes} l="мин" />
+          <span className="cd-colon hidden sm:inline">:</span>
           <Cell v={t.seconds} l="сек" />
         </div>
       )}

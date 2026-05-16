@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import {
   collection, addDoc, serverTimestamp, onSnapshot, orderBy, query,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { useAuth } from "@/lib/auth";
 
 type Photo = {
@@ -45,9 +45,10 @@ export default function PhotosPage() {
     if (!file) return;
     setBusy(true);
     try {
-      const r = ref(storage, `photos/${user.uid}/${Date.now()}_${file.name}`);
-      await uploadBytes(r, file);
-      const url = await getDownloadURL(r);
+      const { secure_url: url } = await uploadToCloudinary(file, {
+        folder: `photos/${user.uid}`,
+        fileName: `${Date.now()}_${file.name}`,
+      });
       await addDoc(collection(db, "photos"), {
         url, caption: caption.trim(), frame,
         authorUid: user.uid,

@@ -5,8 +5,8 @@ import {
   doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { useAuth } from "@/lib/auth";
 
 type Profile = {
@@ -84,9 +84,10 @@ export default function ProfilePage() {
     const file = e.target.files?.[0]; if (!file) return;
     setUploading(true);
     try {
-      const r = ref(storage, `avatars/${uid}/${Date.now()}_${file.name}`);
-      await uploadBytes(r, file);
-      const url = await getDownloadURL(r);
+      const { secure_url: url } = await uploadToCloudinary(file, {
+        folder: `avatars/${uid}`,
+        fileName: `${Date.now()}_${file.name}`,
+      });
       await updateDoc(doc(db, "users", uid), { photoURL: url });
       setP((prev) => prev ? { ...prev, photoURL: url } : prev);
     } finally { setUploading(false); }
