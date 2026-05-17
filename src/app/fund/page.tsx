@@ -68,9 +68,9 @@ export default function FundPage() {
 
   // Жинхэнэ хураамжийн түвшин (0-1)
   const realFill = Math.min(1, total / GOAL);
-  // Хэрэглэгч дүн оруулсан үед урьдчилан харах
-  const previewтөлбөр товч дээр зогсож байгаа үед урьдчилан харах (хэрэв нэвтэрсэн бол)
-  const preview = user ? Math.min(1, (total + FEE
+  // Төлбөр товч дээр зогсож байгаа үед урьдчилан харах (нэвтэрсэн бол)
+  const preview = user ? Math.min(1, (total + FEE) / GOAL) : null;
+  const displayFill = preview ?? realFill;
 
   // Шингэний түвшин (jar internal coords: 100..340 = 240 units tall)
   const liquidHeight = 240 * displayFill;
@@ -83,15 +83,15 @@ export default function FundPage() {
       setError("Эхлээд нэвтэрнэ үү.");
       return;
     }
-    const amt = Number(amount);
-    if (!Number.isFinite(amt) || amt < 100) {
     setBusy(true);
     try {
       const res = await fetch("/api/byl/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: FEE: user.displayName ?? "",
+          amount: FEE,
+          uid: user.uid,
+          displayName: user.displayName ?? "",
         }),
       });
       const data = await res.json();
@@ -154,13 +154,6 @@ export default function FundPage() {
 
         {/* Donate form */}
         <form onSubmit={submit} className="mt-12 max-w-md mx-auto space-y-4">
-          <div>
-            <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3 text-center">
-              Хураамжийн дүн (₮)
-            </label>
-            <input
-              type="number"
-              min={100}
           {/* Fixed fee display */}
           <div className="text-center">
             <div className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">
@@ -196,7 +189,14 @@ export default function FundPage() {
 
           <button
             type="submit"
-            disabled={busy || !user
+            disabled={busy || !user}
+            className="fund-pay-btn w-full"
+          >
+            {busy ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Шилжүүлж байна...
+              </span>
             ) : (
               "Хураамж төлөх"
             )}
