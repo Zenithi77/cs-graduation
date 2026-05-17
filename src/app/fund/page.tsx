@@ -66,7 +66,7 @@ export default function FundPage() {
   );
   const animTotal = useCountUp(total);
 
-  // Жинхэнэ хандивын түвшин (0-1)
+  // Жинхэнэ хураамжийн түвшин (0-1)
   const realFill = Math.min(1, total / GOAL);
   // Хэрэглэгч дүн оруулсан үед урьдчилан харах
   const previewN = Number(amount);
@@ -125,7 +125,7 @@ export default function FundPage() {
             Хамтдаа <span className="gold-text">бүтээе</span>
           </h1>
           <p className="text-white/55 mt-4 max-w-lg mx-auto text-sm md:text-base">
-            Танай хандив шилэн савыг алтаар дүүргэнэ. Бодит цагт явц харагдана.
+            Танай хураамж шилэн савыг алтаар дүүргэнэ. Бодит цагт явц харагдана.
           </p>
         </div>
 
@@ -163,7 +163,7 @@ export default function FundPage() {
         <form onSubmit={submit} className="mt-12 max-w-md mx-auto space-y-4">
           <div>
             <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3 text-center">
-              Хандивын дүн (₮)
+              Хураамжийн дүн (₮)
             </label>
             <input
               type="number"
