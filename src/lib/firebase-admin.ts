@@ -37,5 +37,6 @@ function initAdmin(): App {
 }
 
 export function getAdminDb(): Firestore {
-  return getFirestore(initAdmin());
+  // Project дотор "default" нэртэй named database байгаа тул заавал ID өгнө.
+  return getFirestore(initAdmin(), "default");
 }

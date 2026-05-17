@@ -30,15 +30,22 @@ if (typeof window !== "undefined" && !firebaseConfig.projectId) {
 // Force long-polling so corporate proxies / strict networks / browser
 // extensions that block Firestore's WebChannel streaming don't cause
 // "client is offline" errors.
+// NOTE: The Firestore database in this project is a named database called
+// "default" (not the implicit `(default)`), so we must pass the database ID.
+const DB_ID = "default";
 let _db: Firestore;
 try {
-  _db = initializeFirestore(app, {
-    experimentalForceLongPolling: true,
-    useFetchStreams: false,
-  } as any);
+  _db = initializeFirestore(
+    app,
+    {
+      experimentalForceLongPolling: true,
+      useFetchStreams: false,
+    } as any,
+    DB_ID
+  );
 } catch {
   // Already initialized (e.g. HMR) — fall back to existing instance.
-  _db = getFirestore(app);
+  _db = getFirestore(app, DB_ID);
 }
 
 export const auth = getAuth(app);
