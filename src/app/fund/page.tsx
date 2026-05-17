@@ -42,11 +42,11 @@ function useCountUp(target: number, duration = 1400) {
 }
 
 const GOAL = 1_620_000;
+const FEE = 15_000;
 
 export default function FundPage() {
   const { user } = useAuth();
   const [donations, setDonations] = useState<Donation[]>([]);
-  const [amount, setAmount] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,10 +69,8 @@ export default function FundPage() {
   // Жинхэнэ хураамжийн түвшин (0-1)
   const realFill = Math.min(1, total / GOAL);
   // Хэрэглэгч дүн оруулсан үед урьдчилан харах
-  const previewN = Number(amount);
-  const preview =
-    previewN > 0 ? Math.min(1, (total + previewN) / GOAL) : null;
-  const displayFill = preview ?? realFill;
+  const previewтөлбөр товч дээр зогсож байгаа үед урьдчилан харах (хэрэв нэвтэрсэн бол)
+  const preview = user ? Math.min(1, (total + FEE
 
   // Шингэний түвшин (jar internal coords: 100..340 = 240 units tall)
   const liquidHeight = 240 * displayFill;
@@ -87,18 +85,13 @@ export default function FundPage() {
     }
     const amt = Number(amount);
     if (!Number.isFinite(amt) || amt < 100) {
-      setError("Дүн дор хаяж 100₮ байх ёстой.");
-      return;
-    }
     setBusy(true);
     try {
       const res = await fetch("/api/byl/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: amt,
-          uid: user.uid,
-          displayName: user.displayName ?? "",
+          amount: FEE: user.displayName ?? "",
         }),
       });
       const data = await res.json();
@@ -168,14 +161,17 @@ export default function FundPage() {
             <input
               type="number"
               min={100}
-              max={1_620_000}
-              step={100}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-              className="fund-input"
-              inputMode="numeric"
-            />
+          {/* Fixed fee display */}
+          <div className="text-center">
+            <div className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">
+              Нэг хүний хураамж
+            </div>
+            <div className="inline-flex items-baseline gap-2 rounded-2xl border border-[#f3d77a]/30 bg-white/[0.03] px-8 py-5 backdrop-blur">
+              <span className="font-display text-5xl md:text-6xl gold-text leading-none">
+                {FEE.toLocaleString()}
+              </span>
+              <span className="text-white/60 text-2xl font-display">₮</span>
+            </div>
           </div>
 
           {!user && (
@@ -200,14 +196,7 @@ export default function FundPage() {
 
           <button
             type="submit"
-            disabled={busy || !user || !amount}
-            className="fund-pay-btn"
-          >
-            {busy ? (
-              <span className="inline-flex items-center justify-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Шилжүүлж байна...
-              </span>
+            disabled={busy || !user
             ) : (
               "Хураамж төлөх"
             )}
