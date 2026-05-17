@@ -27,13 +27,15 @@ if (typeof window !== "undefined" && !firebaseConfig.projectId) {
   );
 }
 
-// Use long-polling auto-detect so corporate proxies / strict networks that
-// block Firestore's WebChannel streaming don't cause "client is offline".
+// Force long-polling so corporate proxies / strict networks / browser
+// extensions that block Firestore's WebChannel streaming don't cause
+// "client is offline" errors.
 let _db: Firestore;
 try {
   _db = initializeFirestore(app, {
-    experimentalAutoDetectLongPolling: true,
-  });
+    experimentalForceLongPolling: true,
+    useFetchStreams: false,
+  } as any);
 } catch {
   // Already initialized (e.g. HMR) — fall back to existing instance.
   _db = getFirestore(app);

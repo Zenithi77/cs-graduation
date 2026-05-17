@@ -1,13 +1,16 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  collection, addDoc, serverTimestamp, onSnapshot, orderBy, query, doc, getDoc, setDoc,
+  collection, onSnapshot, orderBy, query, doc, getDoc, setDoc,
 } from "firebase/firestore";
 import {
-  Landmark, User as UserIcon, FileText, Sparkles, Users, TrendingUp, Target, Trophy, Copy, Check,
+  Landmark, User as UserIcon, FileText, Sparkles, Users, TrendingUp, Target, Trophy, Copy, Check, CreditCard, AlertCircle,
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth";
+
+const PRESET_AMOUNTS = [15000, 25000, 50000, 100000] as const;
+type PresetAmount = (typeof PRESET_AMOUNTS)[number];
 
 type Donation = {
   id: string;
@@ -52,10 +55,11 @@ function useCountUp(target: number, duration = 1400) {
 export default function FundPage() {
   const { user } = useAuth();
   const [donations, setDonations] = useState<Donation[]>([]);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState<number | "">("");
+  const [selectedAmount, setSelectedAmount] = useState<PresetAmount | "custom">(15000);
+  const [customAmount, setCustomAmount] = useState<string>("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
   const [goal, setGoal] = useState<number>(5_000_000);
   const [copied, setCopied] = useState(false);
 
@@ -115,18 +119,42 @@ export default function FundPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || Number(amount) <= 0) return;
+    setPayError(null);
+
+    if (!user) {
+      setPayError("Эхлээд нэвтэрнэ үү.");
+      return;
+    }
+
+    const amount =
+      selectedAmount === "custom" ? Number(customAmount) : selectedAmount;
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setPayError("Дүн буруу байна.");
+      return;
+    }
+
     setBusy(true);
     try {
-      await addDoc(collection(db, "donations"), {
-        name: name.trim() || (user?.displayName ?? "Нэргүй"),
-        amount: Number(amount),
-        note: note.trim() || "",
-        uid: user?.uid ?? null,
-        createdAt: serverTimestamp(),
+      const res = await fetch("/api/byl/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          uid: user.uid,
+          displayName: user.displayName ?? "",
+          note: note.trim(),
+        }),
       });
-      setName(""); setAmount(""); setNote("");
-    } finally { setBusy(false); }
+      const data = await res.json();
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Checkout үүсгэж чадсангүй.");
+      }
+      // byl.mn-ийн hosted checkout хуудас руу шилжүүлнэ
+      window.location.href = data.url;
+    } catch (err: any) {
+      setPayError(err?.message || "Алдаа гарлаа.");
+      setBusy(false);
+    }
   };
 
   const milestones = [25, 50, 75, 100];
@@ -307,22 +335,109 @@ export default function FundPage() {
           </div>
         </div>
 
-        <form onSubmit={submit} className="card p-6 grid grid-cols-2 gap-4 content-start">
-          <h3 className="col-span-2 font-display text-xl">Төлбөр бүртгүүлэх</h3>
-          <div className="col-span-2">
-            <label className="label">Нэр</label>
-            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={user?.displayName ?? "Нэргүй"} />
+        <form onSubmit={submit} className="card p-6 grid gap-4 content-start">
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-xl flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-wine" /> Картаар төлөх
+            </h3>
+            <span className="text-[10px] uppercase tracking-widest text-black/40">
+              Qpay · SocialPay · Pocket
+            </span>
           </div>
+
           <div>
-            <label className="label">Дүн (₮)</label>
-            <input className="input" type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))} required />
+            <label className="label">Дүн сонгох</label>
+            <div className="grid grid-cols-2 gap-2">
+              {PRESET_AMOUNTS.map((amt) => {
+                const active = selectedAmount === amt;
+                return (
+                  <button
+                    type="button"
+                    key={amt}
+                    onClick={() => setSelectedAmount(amt)}
+                    className={`rounded-xl border px-4 py-3 text-left transition ${
+                      active
+                        ? "border-wine bg-wine text-white shadow-sm"
+                        : "border-black/15 hover:border-wine/60 bg-white"
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase tracking-widest opacity-70">
+                      Багц
+                    </div>
+                    <div className="font-display text-xl">
+                      {amt.toLocaleString()}₮
+                    </div>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => setSelectedAmount("custom")}
+                className={`col-span-2 rounded-xl border px-4 py-3 text-left transition ${
+                  selectedAmount === "custom"
+                    ? "border-wine bg-wine text-white"
+                    : "border-black/15 hover:border-wine/60 bg-white"
+                }`}
+              >
+                <div className="text-[10px] uppercase tracking-widest opacity-70">
+                  Бусад дүн
+                </div>
+                <div className="font-display text-base">Өөрөө оруулах</div>
+              </button>
+            </div>
+
+            {selectedAmount === "custom" && (
+              <input
+                className="input mt-3"
+                type="number"
+                min={1000}
+                max={5_000_000}
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                placeholder="Жш: 30000"
+                required
+              />
+            )}
           </div>
+
           <div>
-            <label className="label">Курс / Тэмдэглэл</label>
-            <input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="3-р курс" />
+            <label className="label">Тэмдэглэл (заавал биш)</label>
+            <input
+              className="input"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="3-р курс / Баярлалаа гэх мэт"
+              maxLength={200}
+            />
           </div>
-          <div className="col-span-2 flex justify-end">
-            <button className="btn btn-gold" disabled={busy}>{busy ? "..." : "Бүртгүүлэх"}</button>
+
+          {!user && (
+            <div className="flex items-start gap-2 text-sm rounded-lg border border-amber-300 bg-amber-50 text-amber-900 p-3">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+              <span>
+                Төлбөр хийхийн тулд эхлээд{" "}
+                <a href="/login" className="underline font-semibold">
+                  нэвтэрнэ үү
+                </a>
+                .
+              </span>
+            </div>
+          )}
+
+          {payError && (
+            <div className="flex items-start gap-2 text-sm rounded-lg border border-red-300 bg-red-50 text-red-800 p-3">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+              <span>{payError}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-black/55">
+              Төлбөрийг <b>byl.mn</b> аар дамжуулан хүлээн авна.
+            </div>
+            <button className="btn btn-gold" disabled={busy || !user}>
+              {busy ? "..." : "Төлөх →"}
+            </button>
           </div>
         </form>
       </div>

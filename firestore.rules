@@ -23,11 +23,12 @@ service cloud.firestore {
     }
 
     match /donations/{id} {
+      // Хандивыг ил тод харуулна.
       allow read: if true;
-      allow create: if request.resource.data.amount is number
-                    && request.resource.data.amount > 0
-                    && request.resource.data.name is string;
-      allow update, delete: if false;
+      // ⚠️ Client-ээс create/update/delete БҮРЭН хаалттай.
+      // Зөвхөн серверийн Firebase Admin SDK (webhook) бичих эрхтэй —
+      // Admin SDK rules-ыг алгасдаг тул энэ нь зөв ажиллана.
+      allow write: if false;
     }
 
     match /fund/{id} {
