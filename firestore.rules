@@ -60,5 +60,13 @@ service cloud.firestore {
       allow read: if isSelf(uid);
       allow write: if isSelf(uid);
     }
+
+    // Pre-added account metadata (class, firstname, lastname, synthetic email).
+    // No sensitive data — passwords live only in Firebase Auth.
+    // Readable by anyone so the login page can populate dropdowns before auth.
+    match /accounts/{uid} {
+      allow read: if true;
+      allow write: if false; // admin SDK only (seed script)
+    }
   }
 }

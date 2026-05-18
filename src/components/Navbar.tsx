@@ -53,10 +53,7 @@ export default function Navbar() {
                 <button onClick={() => logout()} className="btn btn-ghost text-sm">Гарах</button>
               </>
             ) : (
-              <>
-                <Link href="/login" className="btn btn-ghost text-sm">Нэвтрэх</Link>
-                <Link href="/signup" className="btn btn-primary text-sm">Бүртгүүлэх</Link>
-              </>
+              <Link href="/login" className="btn btn-ghost text-sm">Нэвтрэх</Link>
             )}
           </div>
 
@@ -188,14 +185,9 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <Link href="/login" onClick={close} className="btn btn-ghost text-sm justify-center">
-                  Нэвтрэх
-                </Link>
-                <Link href="/signup" onClick={close} className="btn btn-primary text-sm justify-center">
-                  Бүртгүүлэх
-                </Link>
-              </div>
+              <Link href="/login" onClick={close} className="btn btn-ghost text-sm justify-center w-full">
+                Нэвтрэх
+              </Link>
             )}
           </div>
         </aside>
