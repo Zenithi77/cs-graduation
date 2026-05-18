@@ -38,13 +38,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    // Сайтын URL-г env-ээс (production) эсвэл request origin-оос (fallback) ав.
+    // byl нь зөвхөн http/https-тэй бүрэн URL зөвшөөрнө.
+    const envSite = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
+    const site =
+      envSite && /^https?:\/\//i.test(envSite)
+        ? envSite
+        : req.nextUrl.origin;
+
     const productName = displayName
       ? `Төгсөлтийн хураамж — ${displayName}`
       : "Төгсөлтийн хураамж";
 
+    // {CHECKOUT_ID} placeholder-ийн curly braces-ийг URL-encode хийнэ —
+    // эс бөгөөс byl-ийн URL validator "must be a valid URL" гэж татгалзана.
     const checkout = await createCheckout({
-      success_url: `${site}/fund/success?checkout_id={CHECKOUT_ID}`,
+      success_url: `${site}/fund/success?checkout_id=%7BCHECKOUT_ID%7D`,
       cancel_url: `${site}/fund`,
       client_reference_id: uid,
       items: [
