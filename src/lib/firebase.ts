@@ -33,7 +33,7 @@ if (typeof window !== "undefined" && !firebaseConfig.projectId) {
 // "client is offline" errors.
 // NOTE: The Firestore database in this project is a named database called
 // "default" (not the implicit `(default)`), so we must pass the database ID.
-const DB_ID = "default";
+const DB_ID = "(default)";
 let _db: Firestore;
 try {
   _db = initializeFirestore(

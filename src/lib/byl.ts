@@ -62,6 +62,33 @@ export async function createCheckout(
 }
 
 /**
+ * Тодорхой checkout-ийг id-ээр нь авна. Webhook localhost-д ирэхгүй үед
+ * /fund/success хуудаснаас баталгаажуулалт хийхэд хэрэглэнэ.
+ */
+export async function getCheckout(
+  checkoutId: string | number
+): Promise<BylCheckoutObject> {
+  assertEnv();
+  const url = `${API_BASE}/projects/${PROJECT_ID}/checkouts/${checkoutId}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${TOKEN}`,
+    },
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      `[byl] checkout fetch алдаа (${res.status}): ${text.slice(0, 500)}`
+    );
+  }
+  const json = (await res.json()) as { data: BylCheckoutObject };
+  return json.data;
+}
+
+/**
  * Webhook гарын үсэг шалгах.
  * @param rawBody  request body-ийн raw string (JSON.parse хийгээгүй)
  * @param signature `Byl-Signature` header-ийн утга

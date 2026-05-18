@@ -66,7 +66,7 @@ function initAdmin() {
 async function main() {
   initAdmin();
   const adminAuth = getAuth();
-  const db = getFirestore(undefined as any, "default");
+  const db = getFirestore(undefined as any, "(default)");
 
   const dataPath = path.resolve(__dirname, "accounts-data.json");
   if (!fs.existsSync(dataPath)) {

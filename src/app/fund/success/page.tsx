@@ -14,6 +14,31 @@ function SuccessInner() {
     return () => clearTimeout(t);
   }, []);
 
+  // Webhook localhost-д ирэхгүй тул /api/byl/confirm-ээр төлбөрийг
+  // баталгаажуулж `payments` collection-д бичүүлнэ. Webhook ажилласан
+  // тохиолдолд endpoint ямар ч өөрчлөлт хийхгүй (idempotent).
+  useEffect(() => {
+    if (!checkoutId || checkoutId === "{CHECKOUT_ID}") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/byl/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ checkout_id: checkoutId }),
+        });
+        if (!cancelled && !res.ok) {
+          console.warn("[fund/success] confirm failed:", res.status);
+        }
+      } catch (err) {
+        if (!cancelled) console.warn("[fund/success] confirm error:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [checkoutId]);
+
   return (
     <div className="fund-page-bg">
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
