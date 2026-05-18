@@ -154,7 +154,7 @@ export default function FundPage() {
 
   return (
     <div className="fund-page-bg">
-      <div className="max-w-3xl mx-auto px-4 py-16 md:py-24">
+      <div className="max-w-3xl mx-auto px-4 pt-3 pb-4 md:pt-5 md:pb-6">
         {/* Heading */}
         <div className="text-center">
           <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.35em] text-[#f3d77a]/80">
@@ -167,7 +167,7 @@ export default function FundPage() {
         </div>
 
         {/* Jar */}
-        <div className="mt-12 relative">
+        <div className="mt-[5px] md:mt-[10px] relative">
           <div className="jar-glow" />
           <div className="jar-stage">
             <JarSvg liquidY={liquidY} fillRatio={displayFill} />
@@ -187,11 +187,6 @@ export default function FundPage() {
             </div>
           </div>
 
-          {/* Below jar */}
-          <div className="text-center mt-6 text-white/45 text-sm">
-            <span className="text-[#f3d77a]">{Math.round(realFill * 100)}%</span>{" "}
-            биелсэн
-          </div>
         </div>
 
         {/* Paid state — already paid users see a confirmation panel */}
@@ -199,19 +194,7 @@ export default function FundPage() {
           <PaidPanel total={myTotal ?? 0} lastAt={myLastAt} />
         ) : (
           /* Donate form */
-          <form onSubmit={submit} className="mt-12 max-w-md mx-auto space-y-4">
-            {/* Fixed fee display */}
-            <div className="text-center">
-              <div className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">
-                Нэг хүний хураамж
-              </div>
-              <div className="inline-flex items-baseline gap-2 rounded-2xl border border-[#f3d77a]/30 bg-white/[0.03] px-8 py-5 backdrop-blur">
-                <span className="font-display text-5xl md:text-6xl gold-text leading-none">
-                  {FEE.toLocaleString()}
-                </span>
-                <span className="text-white/60 text-2xl font-display">₮</span>
-              </div>
-            </div>
+          <form onSubmit={submit} className="mt-3 md:mt-4 max-w-md mx-auto space-y-3">
 
             {!user && (
               <div className="flex items-start gap-2 text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-200 p-3.5">
