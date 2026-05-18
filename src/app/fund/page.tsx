@@ -167,7 +167,7 @@ export default function FundPage() {
         </div>
 
         {/* Jar */}
-        <div className="mt-[5px] md:mt-[10px] relative">
+        <div className="mt-[2px] md:mt-[4px] relative">
           <div className="jar-glow" />
           <div className="jar-stage">
             <JarSvg liquidY={liquidY} fillRatio={displayFill} />
