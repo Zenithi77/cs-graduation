@@ -1,7 +1,8 @@
 // POST /api/byl/webhook
 // byl.mn-ээс ирэх event-уудыг хүлээж аваад HMAC-SHA256 гарын үсгийг шалгана.
-// Амжилттай тохиолдолд Firestore-д donation бичиж, хэрэглэгчийн нийт хандивыг
-// FieldValue.increment-ээр шинэчилнэ.
+// Амжилттай тохиолдолд Firestore-ийн `payments` collection-д бичиж, давхар
+// боловсруулалтаас сэргийлэхийн тулд `processed_webhook_events`-д event-ийг
+// тэмдэглэнэ.
 import { NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature, BylWebhookEvent } from "@/lib/byl";
 import { getAdminDb } from "@/lib/firebase-admin";
@@ -10,6 +11,62 @@ import { FieldValue } from "firebase-admin/firestore";
 // ⚠️ Заавал nodejs runtime — crypto + raw body хэрэгтэй
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function formatAmount(n: number): string {
+  // "5000.000000000000" хэлбэртэй 12 оронтой decimal string
+  return (Number.isFinite(n) ? n : 0).toFixed(12);
+}
+
+// checkout.completed-ийн `data.object`-оос зөвхөн шаардлагатай талбаруудыг шүүж
+// үлдээнэ. success_url / cancel_url / payment_method зэрэг payments collection-д
+// хадгалах шаардлагагүй талбаруудыг хасна.
+function sanitizeCheckoutRaw(obj: any) {
+  const items = Array.isArray(obj?.items)
+    ? obj.items.map((it: any) => ({
+        adjustable_quantity: it?.adjustable_quantity ?? null,
+        amount_subtotal: it?.amount_subtotal ?? null,
+        amount_total: it?.amount_total ?? null,
+        amount_unit: it?.amount_unit ?? null,
+        price: it?.price
+          ? {
+              id: it.price.id ?? null,
+              type: it.price.type ?? null,
+              unit_amount: it.price.unit_amount ?? null,
+            }
+          : null,
+        product: it?.product
+          ? {
+              client_reference_id: it.product.client_reference_id ?? null,
+              id: it.product.id ?? null,
+              name: it.product.name ?? null,
+            }
+          : null,
+        quantity: it?.quantity ?? null,
+      }))
+    : [];
+
+  return {
+    amount_subtotal: obj?.amount_subtotal ?? null,
+    amount_total: obj?.amount_total ?? null,
+    client_reference_id: obj?.client_reference_id ?? null,
+    created_at: obj?.created_at ?? null,
+    customer: obj?.customer ?? null,
+    customer_email: obj?.customer_email ?? null,
+    delivery_address: obj?.delivery_address ?? null,
+    delivery_address_collection: obj?.delivery_address_collection ?? false,
+    expires_at: obj?.expires_at ?? null,
+    id: obj?.id ?? null,
+    is_guest: obj?.is_guest ?? false,
+    items,
+    mode: obj?.mode ?? null,
+    phone_number: obj?.phone_number ?? null,
+    phone_number_collection: obj?.phone_number_collection ?? false,
+    project_id: obj?.project_id ?? null,
+    status: obj?.status ?? null,
+    updated_at: obj?.updated_at ?? null,
+    url: obj?.url ?? null,
+  };
+}
 
 export async function POST(req: NextRequest) {
   // 1) Raw body уншина (signature шалгах хэрэгцээтэй)
@@ -37,63 +94,48 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
 
-  // 4) Handler
   try {
     const db = getAdminDb();
+    const eventId = String((event as any).id ?? "");
+    const eventType = (event as any).type ?? "unknown";
+
+    // Idempotency — давтан хүлээж авсан event бол алгасна
+    const eventRef = eventId
+      ? db.collection("processed_webhook_events").doc(eventId)
+      : null;
+    if (eventRef) {
+      const eventSnap = await eventRef.get();
+      if (eventSnap.exists) {
+        return NextResponse.json({ ok: true, duplicate: true });
+      }
+    }
 
     if (event.type === "checkout.completed") {
       const obj = event.data.object;
       const checkoutId = String(obj.id);
-      const ref = db.collection("donations").doc(`checkout_${checkoutId}`);
-
-      // Idempotency — нэг checkout-д зөвхөн нэг donation
-      const existing = await ref.get();
-      if (existing.exists) {
-        return NextResponse.json({ ok: true, duplicate: true });
-      }
+      const paymentRef = db.collection("payments").doc(`checkout_${checkoutId}`);
 
       const uid = obj.client_reference_id || null;
-      const amount = Number(obj.amount_total) || 0;
-      const productName =
-        obj.items?.[0]?.price?.product?.name || "Төгсөлтийн хураамж";
-
-      // displayName-ийг users/{uid} баримтаас уншиж donation-д хадгална
-      let name = "Нэргүй";
-      if (uid) {
-        const userSnap = await db.collection("users").doc(uid).get();
-        if (userSnap.exists) {
-          const u = userSnap.data() as any;
-          name = u?.displayName || u?.email || "Нэргүй";
-        }
-      } else if (obj.customer_email) {
-        name = obj.customer_email;
-      }
+      const amountNum = Number(obj.amount_total) || 0;
+      const isPaid = obj.status === "complete";
 
       const batch = db.batch();
-      batch.set(ref, {
-        source: "byl",
-        checkoutId: obj.id,
-        uid,
-        name,
-        amount,
-        note: productName,
-        paymentMethod: obj.payment_method ?? null,
-        customerEmail: obj.customer_email ?? null,
-        phoneNumber: obj.phone_number ?? null,
-        status: obj.status,
+      batch.set(paymentRef, {
+        amount: formatAmount(amountNum),
+        checkoutRaw: sanitizeCheckoutRaw(obj),
+        checkout_id: obj.id,
+        client_reference_id: uid,
         createdAt: FieldValue.serverTimestamp(),
-        bylCreatedAt: obj.created_at,
+        paidAt: FieldValue.serverTimestamp(),
+        planId: "unknown",
+        status: isPaid ? "paid" : obj.status,
       });
 
-      if (uid && amount > 0) {
-        batch.set(
-          db.collection("users").doc(uid),
-          {
-            totalDonated: FieldValue.increment(amount),
-            lastDonatedAt: FieldValue.serverTimestamp(),
-          },
-          { merge: true }
-        );
+      if (eventRef) {
+        batch.set(eventRef, {
+          eventType,
+          processedAt: FieldValue.serverTimestamp(),
+        });
       }
 
       await batch.commit();
@@ -102,27 +144,40 @@ export async function POST(req: NextRequest) {
 
     if (event.type === "invoice.paid") {
       const obj = event.data.object;
-      const ref = db.collection("donations").doc(`invoice_${obj.id}`);
-      const existing = await ref.get();
-      if (existing.exists) {
-        return NextResponse.json({ ok: true, duplicate: true });
-      }
-      await ref.set({
-        source: "byl-invoice",
-        invoiceId: obj.id,
-        number: obj.number,
-        uid: obj.client_reference_id || null,
-        name: "Нэхэмжлэх",
-        amount: Number(obj.amount) || 0,
-        note: obj.description || "",
-        status: obj.status,
+      const paymentRef = db.collection("payments").doc(`invoice_${obj.id}`);
+      const amountNum = Number(obj.amount) || 0;
+      const isPaid = obj.status === "paid";
+
+      const batch = db.batch();
+      batch.set(paymentRef, {
+        amount: formatAmount(amountNum),
+        checkoutRaw: sanitizeCheckoutRaw(obj),
+        checkout_id: obj.id,
+        client_reference_id: obj.client_reference_id || null,
         createdAt: FieldValue.serverTimestamp(),
-        bylCreatedAt: obj.created_at,
+        paidAt: FieldValue.serverTimestamp(),
+        planId: "unknown",
+        status: isPaid ? "paid" : obj.status,
       });
+
+      if (eventRef) {
+        batch.set(eventRef, {
+          eventType,
+          processedAt: FieldValue.serverTimestamp(),
+        });
+      }
+
+      await batch.commit();
       return NextResponse.json({ ok: true });
     }
 
-    // Танихгүй event төрөл — 200 буцаагаад дуусгана (Byl дахин оролдохгүй)
+    // Танихгүй event төрөл — processed гэж тэмдэглээд 200 буцаана
+    if (eventRef) {
+      await eventRef.set({
+        eventType,
+        processedAt: FieldValue.serverTimestamp(),
+      });
+    }
     return NextResponse.json({ ok: true, ignored: true });
   } catch (err: any) {
     console.error("[byl webhook] handler error:", err);

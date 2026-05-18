@@ -1,17 +1,18 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { collection, doc, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Sparkles, AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth";
 import { FUND_FEE } from "@/lib/constants";
 
-type Donation = {
+type Payment = {
   id: string;
-  name?: string;
-  amount: number;
-  createdAt?: any;
+  amount?: string | number;
+  status?: string;
+  client_reference_id?: string | null;
+  paidAt?: any;
 };
 
 /** Smooth animated number counter */
@@ -48,48 +49,68 @@ const FEE = FUND_FEE;
 
 export default function FundPage() {
   const { user } = useAuth();
-  const [donations, setDonations] = useState<Donation[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [myTotal, setMyTotal] = useState<number | null>(null);
-  const [myLastAt, setMyLastAt] = useState<any>(null);
 
+  // Зөвхөн status == "paid" төлбөрүүдийг real-time-аар авна.
   useEffect(() => {
-    const q = query(collection(db, "donations"));
+    const q = query(
+      collection(db, "payments"),
+      where("status", "==", "paid"),
+    );
     const unsub = onSnapshot(
       q,
-      (s) => setDonations(s.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))),
+      (s) => setPayments(s.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))),
       (err) => console.warn("[fund] snapshot:", err)
     );
     return () => unsub();
   }, []);
 
-  // Хэрэглэгчийн нийт төлсөн дүнг бодит цагт авах.
-  useEffect(() => {
-    if (!user) {
-      setMyTotal(null);
-      setMyLastAt(null);
-      return;
-    }
-    const unsub = onSnapshot(
-      doc(db, "users", user.uid),
-      (s) => {
-        const data = s.data() as any;
-        setMyTotal(Number(data?.totalDonated) || 0);
-        setMyLastAt(data?.lastDonatedAt || null);
-      },
-      (err) => console.warn("[fund] user snapshot:", err)
-    );
-    return () => unsub();
-  }, [user]);
+  // Тухайн хэрэглэгчийн төлсөн төлбөрүүд (client_reference_id == uid).
+  const myPayments = useMemo(
+    () =>
+      user
+        ? payments.filter((p) => p.client_reference_id === user.uid)
+        : [],
+    [payments, user]
+  );
 
-  const hasPaid = !!user && (myTotal ?? 0) >= FEE;
+  const myTotal = useMemo(
+    () => myPayments.reduce((s, p) => s + (parseFloat(String(p.amount)) || 0), 0),
+    [myPayments]
+  );
 
+  const myLastAt = useMemo(() => {
+    if (myPayments.length === 0) return null;
+    return myPayments.reduce<any>((latest, p) => {
+      const t = p.paidAt;
+      if (!t) return latest;
+      if (!latest) return t;
+      const lhs = t?.toMillis?.() ?? new Date(t).getTime();
+      const rhs = latest?.toMillis?.() ?? new Date(latest).getTime();
+      return lhs > rhs ? t : latest;
+    }, null);
+  }, [myPayments]);
+
+  const hasPaid = !!user && myTotal >= FEE;
+
+  // Бүх `paid` төлбөрийн нийт дүн — шилэн савны түвшинд харуулна.
   const total = useMemo(
-    () => donations.reduce((s, d) => s + (Number(d.amount) || 0), 0),
-    [donations]
+    () =>
+      payments.reduce((s, p) => s + (parseFloat(String(p.amount)) || 0), 0),
+    [payments]
   );
   const animTotal = useCountUp(total);
+
+  // Дэмжсэн хүний тоо — давхардсан client_reference_id-уудыг нэгтгэнэ.
+  const supporterCount = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of payments) {
+      if (p.client_reference_id) set.add(String(p.client_reference_id));
+    }
+    return set.size;
+  }, [payments]);
 
   // Жинхэнэ хураамжийн түвшин (0-1)
   const realFill = Math.min(1, total / GOAL);
@@ -171,7 +192,7 @@ export default function FundPage() {
 
           {/* Below jar */}
           <div className="text-center mt-6 text-white/45 text-sm">
-            <span className="text-white/80 font-semibold">{donations.length}</span>{" "}
+            <span className="text-white/80 font-semibold">{supporterCount}</span>{" "}
             хүн дэмжсэн ·{" "}
             <span className="text-[#f3d77a]">{Math.round(realFill * 100)}%</span>{" "}
             биелсэн

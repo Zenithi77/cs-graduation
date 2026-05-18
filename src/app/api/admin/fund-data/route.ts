@@ -1,6 +1,9 @@
 // GET /api/admin/fund-data
 // Бүх төгсөгчдийн төлбөрийн төлвийг Admin SDK-р буцаана. Зөвхөн localhost +
 // идэвхтэй admin session cookie шаардана.
+//
+// Төлбөрийн баталгаажуулалт нь `payments` collection дээр суурилна — тухайн
+// uid-ийн `status == "paid"` төлбөрүүдийн нийт дүнг олж, FUND_FEE-тэй харьцуулна.
 import { NextRequest, NextResponse } from "next/server";
 import {
   isAdminAuthenticated,
@@ -22,6 +25,11 @@ type Row = {
   paid: boolean;
 };
 
+type PaymentAgg = {
+  total: number;
+  lastAt: Date | null;
+};
+
 export async function GET(req: NextRequest) {
   if (!isLocalHost(req.headers.get("host"))) {
     return NextResponse.json({ error: "Not allowed." }, { status: 403 });
@@ -32,22 +40,43 @@ export async function GET(req: NextRequest) {
 
   try {
     const db = getAdminDb();
-    const snap = await db
-      .collection("users")
-      .where("isGraduate", "==", true)
-      .get();
 
-    const users: Row[] = snap.docs.map((d) => {
+    // Параллел: төгсөгчид болон бүх амжилттай төлбөр.
+    const [usersSnap, paymentsSnap] = await Promise.all([
+      db.collection("users").where("isGraduate", "==", true).get(),
+      db.collection("payments").where("status", "==", "paid").get(),
+    ]);
+
+    // Төлбөрүүдийг uid-р нэгтгэнэ.
+    const byUid = new Map<string, PaymentAgg>();
+    for (const doc of paymentsSnap.docs) {
+      const data = doc.data() as any;
+      const uid = data?.client_reference_id;
+      if (!uid || typeof uid !== "string") continue;
+
+      const amount = parseFloat(String(data?.amount)) || 0;
+      const paidAt: Date | null = data?.paidAt?.toDate?.() ?? null;
+
+      const prev = byUid.get(uid) ?? { total: 0, lastAt: null };
+      prev.total += amount;
+      if (paidAt && (!prev.lastAt || paidAt > prev.lastAt)) {
+        prev.lastAt = paidAt;
+      }
+      byUid.set(uid, prev);
+    }
+
+    const users: Row[] = usersSnap.docs.map((d) => {
       const data = d.data() as any;
-      const total = Number(data?.totalDonated) || 0;
-      const last = data?.lastDonatedAt?.toDate?.();
+      const agg = byUid.get(d.id);
+      const total = agg?.total ?? 0;
+      const lastAt = agg?.lastAt ?? null;
       return {
         uid: d.id,
         displayName: data?.displayName || "",
         email: data?.email || "",
         class: data?.class || "",
         totalDonated: total,
-        lastDonatedAt: last ? last.toISOString() : null,
+        lastDonatedAt: lastAt ? lastAt.toISOString() : null,
         paid: total >= FUND_FEE,
       };
     });
