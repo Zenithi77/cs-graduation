@@ -154,20 +154,20 @@ export default function FundPage() {
 
   return (
     <div className="fund-page-bg">
-      <div className="max-w-3xl mx-auto px-4 pt-3 pb-4 md:pt-5 md:pb-6">
+      <div className="max-w-3xl mx-auto px-4 pt-2 pb-3 md:pt-4 md:pb-5">
         {/* Heading */}
         <div className="text-center">
           <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.35em] text-[#f3d77a]/80">
             <Sparkles className="w-3.5 h-3.5" />
             Төгсөлтийн сан
           </div>
-          <h1 className="font-display text-4xl md:text-6xl mt-4 leading-tight text-white">
+          <h1 className="font-display text-3xl md:text-6xl mt-1 leading-tight text-white">
             Хамтдаа <span className="gold-text">бүтээе</span>
           </h1>
         </div>
 
         {/* Jar */}
-        <div className="mt-[2px] md:mt-[4px] relative">
+        <div className="-mt-2 md:mt-1 relative">
           <div className="jar-glow" />
           <div className="jar-stage">
             <JarSvg liquidY={liquidY} fillRatio={displayFill} />
@@ -194,7 +194,7 @@ export default function FundPage() {
           <PaidPanel total={myTotal ?? 0} lastAt={myLastAt} />
         ) : (
           /* Donate form */
-          <form onSubmit={submit} className="mt-3 md:mt-4 max-w-md mx-auto space-y-3">
+          <form onSubmit={submit} className="-mt-2 md:mt-2 max-w-md mx-auto space-y-2">
 
             {!user && (
               <div className="flex items-start gap-2 text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-200 p-3.5">
@@ -231,7 +231,7 @@ export default function FundPage() {
               )}
             </button>
 
-            <p className="text-center text-xs text-white/35">
+            <p className="text-center text-[10px] text-white/35">
               Төлбөрийг{" "}
               <span className="text-[#f3d77a]/80">byl.mn</span>
               -ээр найдвартай дамжуулна
