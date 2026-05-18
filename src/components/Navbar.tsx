@@ -38,7 +38,11 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className="hover:text-wine transition">
+              <Link
+                key={l.href}
+                href={l.href}
+                className="hover:text-wine transition"
+              >
                 {l.label}
               </Link>
             ))}
@@ -47,13 +51,23 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
-                <Link href={`/profiles/${user.uid}`} className="text-sm hover:underline">
+                <Link
+                  href={`/profiles/${user.uid}`}
+                  className="text-sm hover:underline"
+                >
                   {user.displayName || "Профайл"}
                 </Link>
-                <button onClick={() => logout()} className="btn btn-ghost text-sm">Гарах</button>
+                <button
+                  onClick={() => logout()}
+                  className="btn btn-ghost text-sm"
+                >
+                  Гарах
+                </button>
               </>
             ) : (
-              <Link href="/login" className="btn btn-ghost text-sm">Нэвтрэх</Link>
+              <Link href="/login" className="btn btn-ghost text-sm">
+                Нэвтрэх
+              </Link>
             )}
           </div>
 
@@ -72,7 +86,9 @@ export default function Navbar() {
           there doesn't trap our `fixed` positioning inside it. */}
       <div
         className={`md:hidden fixed inset-0 z-50 transition-opacity duration-500 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          open
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         aria-hidden={!open}
       >
@@ -104,7 +120,9 @@ export default function Navbar() {
           <div className="relative h-20 flex items-center justify-between px-6">
             <div className="flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-wine" strokeWidth={1.5} />
-              <span className="font-display italic text-wine tracking-wide">{SITE_NAME}</span>
+              <span className="font-display italic text-wine tracking-wide">
+                {SITE_NAME}
+              </span>
             </div>
             <button
               onClick={close}
@@ -164,7 +182,9 @@ export default function Navbar() {
           >
             <div className="flex items-center gap-3 text-gold mb-5">
               <span className="h-px flex-1 bg-gradient-to-r from-transparent to-gold/40" />
-              <span className="text-[10px] tracking-[0.4em] uppercase text-black/40">Профайл</span>
+              <span className="text-[10px] tracking-[0.4em] uppercase text-black/40">
+                Профайл
+              </span>
               <span className="h-px flex-1 bg-gradient-to-l from-transparent to-gold/40" />
             </div>
 
@@ -178,14 +198,21 @@ export default function Navbar() {
                   {user.displayName || "Миний профайл"}
                 </Link>
                 <button
-                  onClick={() => { close(); logout(); }}
+                  onClick={() => {
+                    close();
+                    logout();
+                  }}
                   className="text-xs uppercase tracking-[0.3em] text-black/50 hover:text-wine py-2 transition"
                 >
                   Гарах
                 </button>
               </div>
             ) : (
-              <Link href="/login" onClick={close} className="btn btn-ghost text-sm justify-center w-full">
+              <Link
+                href="/login"
+                onClick={close}
+                className="btn btn-ghost text-sm justify-center w-full"
+              >
                 Нэвтрэх
               </Link>
             )}

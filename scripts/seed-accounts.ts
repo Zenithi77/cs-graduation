@@ -27,7 +27,7 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 // ── Types ──────────────────────────────────────────────────────────────────
 
 interface AccountEntry {
-  class: string;      // e.g. "КУ-1"
+  class: string; // e.g. "КУ-1"
   firstname: string;
   lastname: string;
   password: string;
@@ -37,7 +37,9 @@ interface AccountEntry {
 
 function initAdmin() {
   if (getApps().length) return;
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY ?? process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  const raw =
+    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ??
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (!raw) throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY env var not set.");
   const parsed = JSON.parse(raw);
   if (typeof parsed.private_key === "string") {
@@ -64,7 +66,11 @@ function slugify(str: string): string {
 
 /** Build the synthetic internal email for an account. */
 function syntheticEmail(entry: AccountEntry): string {
-  const classSlug = entry.class.toLowerCase().replace(/[^a-zа-я0-9]/g, "").replace(/[а-я]/g, (c) => c) || slugify(entry.class);
+  const classSlug =
+    entry.class
+      .toLowerCase()
+      .replace(/[^a-zа-я0-9]/g, "")
+      .replace(/[а-я]/g, (c) => c) || slugify(entry.class);
   const clean = (s: string) => slugify(s).replace(/-/g, "");
   // Keep it readable: ku1.bat.munkh@cs2026.internal
   const prefix = entry.class
@@ -85,12 +91,14 @@ async function main() {
   if (!fs.existsSync(dataPath)) {
     console.error(
       `ERROR: ${dataPath} not found.\n` +
-        "Copy scripts/accounts-data.example.json → scripts/accounts-data.json and fill in real data."
+        "Copy scripts/accounts-data.example.json → scripts/accounts-data.json and fill in real data.",
     );
     process.exit(1);
   }
 
-  const allAccounts: AccountEntry[] = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+  const allAccounts: AccountEntry[] = JSON.parse(
+    fs.readFileSync(dataPath, "utf-8"),
+  );
 
   const classFilter = process.argv[2];
   const accounts = classFilter
@@ -98,14 +106,16 @@ async function main() {
     : allAccounts;
 
   if (classFilter && accounts.length === 0) {
-    console.error(`No accounts found for class "${classFilter}". Check the class name in accounts-data.json.`);
+    console.error(
+      `No accounts found for class "${classFilter}". Check the class name in accounts-data.json.`,
+    );
     process.exit(1);
   }
 
   console.log(
     classFilter
       ? `Processing ${accounts.length} account(s) for class "${classFilter}".\n`
-      : `Processing all ${accounts.length} account(s).\n`
+      : `Processing all ${accounts.length} account(s).\n`,
   );
 
   let created = 0;
@@ -121,7 +131,9 @@ async function main() {
       const existing = await adminAuth.getUserByEmail(email).catch(() => null);
       if (existing) {
         uid = existing.uid;
-        console.log(`  SKIP  ${displayName} (${entry.class}) — Auth user already exists (uid: ${uid})`);
+        console.log(
+          `  SKIP  ${displayName} (${entry.class}) — Auth user already exists (uid: ${uid})`,
+        );
         skipped++;
       } else {
         const created_user = await adminAuth.createUser({

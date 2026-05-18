@@ -16,14 +16,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-export const app: FirebaseApp =
-  getApps().length ? getApp() : initializeApp(firebaseConfig);
+export const app: FirebaseApp = getApps().length
+  ? getApp()
+  : initializeApp(firebaseConfig);
 
 if (typeof window !== "undefined" && !firebaseConfig.projectId) {
   // eslint-disable-next-line no-console
   console.error(
     "[firebase] Missing NEXT_PUBLIC_FIREBASE_* environment variables. " +
-      "Create .env.local from .env.local.example and restart `npm run dev`."
+      "Create .env.local from .env.local.example and restart `npm run dev`.",
   );
 }
 
@@ -41,7 +42,7 @@ try {
       experimentalForceLongPolling: true,
       useFetchStreams: false,
     } as any,
-    DB_ID
+    DB_ID,
   );
 } catch {
   // Already initialized (e.g. HMR) — fall back to existing instance.

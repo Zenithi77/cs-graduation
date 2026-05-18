@@ -66,7 +66,7 @@ export default function LoginPage() {
   const matchingAccounts = useMemo(() => {
     if (!selectedClass || !selectedFirstname) return [];
     return accounts.filter(
-      (a) => a.class === selectedClass && a.firstname === selectedFirstname
+      (a) => a.class === selectedClass && a.firstname === selectedFirstname,
     );
   }, [accounts, selectedClass, selectedFirstname]);
 
@@ -76,7 +76,9 @@ export default function LoginPage() {
   const resolvedAccount = useMemo<AccountDoc | null>(() => {
     if (!hasDuplicateFirstname) return matchingAccounts[0] ?? null;
     if (!selectedLastname) return null;
-    return matchingAccounts.find((a) => a.lastname === selectedLastname) ?? null;
+    return (
+      matchingAccounts.find((a) => a.lastname === selectedLastname) ?? null
+    );
   }, [hasDuplicateFirstname, matchingAccounts, selectedLastname]);
 
   const nameResolved = resolvedAccount !== null;
@@ -101,7 +103,6 @@ export default function LoginPage() {
       <h1 className="font-display text-4xl text-center">Нэвтрэх</h1>
 
       <form onSubmit={submit} className="card p-6 mt-8 space-y-4">
-
         {/* Class */}
         <div>
           <label className="label">Анги</label>
@@ -114,7 +115,9 @@ export default function LoginPage() {
           >
             <option value="">— Анги сонгох —</option>
             {CLASSES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         </div>
@@ -131,7 +134,9 @@ export default function LoginPage() {
             >
               <option value="">— Нэр сонгох —</option>
               {availableFirstnames.map((fn) => (
-                <option key={fn} value={fn}>{fn}</option>
+                <option key={fn} value={fn}>
+                  {fn}
+                </option>
               ))}
             </select>
           </div>
@@ -144,12 +149,17 @@ export default function LoginPage() {
             <select
               className="input"
               value={selectedLastname}
-              onChange={(e) => { setSelectedLastname(e.target.value); setErr(null); }}
+              onChange={(e) => {
+                setSelectedLastname(e.target.value);
+                setErr(null);
+              }}
               required
             >
               <option value="">— Овог сонгох —</option>
               {matchingAccounts.map((a) => (
-                <option key={a.uid} value={a.lastname}>{a.lastname}</option>
+                <option key={a.uid} value={a.lastname}>
+                  {a.lastname}
+                </option>
               ))}
             </select>
           </div>
@@ -163,7 +173,10 @@ export default function LoginPage() {
               className="input"
               type="password"
               value={password}
-              onChange={(e) => { setPassword(e.target.value); setErr(null); }}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErr(null);
+              }}
               required
               autoFocus
             />
@@ -178,7 +191,6 @@ export default function LoginPage() {
         >
           {busy ? "..." : "Нэвтрэх"}
         </button>
-
       </form>
     </div>
   );
