@@ -224,7 +224,6 @@ export default function LogosPage() {
   const [showUploader, setShowUploader] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const uploaderRef = useRef<HTMLDivElement>(null);
 
   const countdown = useCountdown(CONTEST.deadline);
 
@@ -404,10 +403,24 @@ export default function LogosPage() {
     }
   };
 
-  const scrollToUploader = () => {
+  const openUploader = () => {
     setShowUploader(true);
-    setTimeout(() => uploaderRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
   };
+
+  // Lock body scroll while the uploader modal is open
+  useEffect(() => {
+    if (!showUploader) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setShowUploader(false); clearPick(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [showUploader]);
 
   // ─────────────────────── Render ───────────────────────
   return (
@@ -429,7 +442,7 @@ export default function LogosPage() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <button onClick={scrollToUploader} className="btn-hero btn-hero-primary">
+                <button onClick={openUploader} className="btn-hero btn-hero-primary">
                   <Upload className="w-4 h-4" /> Загвар илгээх
                 </button>
                 <a href="#feed" className="btn-hero btn-hero-ghost">
@@ -553,24 +566,17 @@ export default function LogosPage() {
           </section>
         )}
 
-        {/* ===== Upload (collapsible) ===== */}
-        <section ref={uploaderRef} className="mt-12">
-          {!showUploader ? (
-            <button
-              onClick={scrollToUploader}
-              className="cta-banner group"
+        {/* ===== Upload modal ===== */}
+        {showUploader && (
+          <div
+            className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto"
+            onClick={() => { setShowUploader(false); clearPick(); }}
+          >
+            <form
+              onSubmit={upload}
+              onClick={(e) => e.stopPropagation()}
+              className="uploader-card w-full max-w-3xl my-auto shadow-2xl"
             >
-              <div className="flex items-center gap-4">
-                <div className="cta-icon"><Upload className="w-5 h-5" /></div>
-                <div className="text-left">
-                  <div className="font-display text-xl">Өөрийн загвараа илгээх</div>
-                  <div className="text-xs text-black/55">Шууд футболкан дээр байрлуулж, дэвсгэрийг автоматаар арилгана</div>
-                </div>
-              </div>
-              <div className="text-sm font-semibold text-wine group-hover:translate-x-1 transition">Эхлэх →</div>
-            </button>
-          ) : (
-            <form onSubmit={upload} className="uploader-card">
               <div className="uploader-top">
                 <div className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-gold" />
@@ -693,8 +699,8 @@ export default function LogosPage() {
                 </div>
               </div>
             </form>
-          )}
-        </section>
+          </div>
+        )}
 
         {/* ===== Browse toolbar + feed ===== */}
         <section id="feed" className="mt-14 mb-24">
@@ -744,7 +750,7 @@ export default function LogosPage() {
           {visible.length === 0 ? (
             <EmptyState
               hasAny={logos.length > 0}
-              onUpload={scrollToUploader}
+              onUpload={openUploader}
               filtered={search.trim().length > 0 || tab === "mine"}
             />
           ) : (
