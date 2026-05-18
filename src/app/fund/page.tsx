@@ -164,9 +164,6 @@ export default function FundPage() {
           <h1 className="font-display text-4xl md:text-6xl mt-4 leading-tight text-white">
             Хамтдаа <span className="gold-text">бүтээе</span>
           </h1>
-          <p className="text-white/55 mt-4 max-w-lg mx-auto text-sm md:text-base">
-            Танай хураамж шилэн савыг алтаар дүүргэнэ. Бодит цагт явц харагдана.
-          </p>
         </div>
 
         {/* Jar */}
