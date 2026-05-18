@@ -140,8 +140,8 @@ export async function createCheckout(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
     },
     body: JSON.stringify(input),
   });
@@ -205,33 +205,33 @@ export function sanitizeCheckoutRaw(
   obj: Record<string, unknown>,
 ): Record<string, unknown> {
   const rawItems = obj?.items;
-  const items = Array.isArray(rawItems)
-    ? rawItems.map((it: Record<string, unknown>) => {
-        const price = it?.price as Record<string, unknown> | undefined;
-        const product = it?.product as Record<string, unknown> | undefined;
-        return {
-          adjustable_quantity: it?.adjustable_quantity ?? null,
-          amount_subtotal: it?.amount_subtotal ?? null,
-          amount_total: it?.amount_total ?? null,
-          amount_unit: it?.amount_unit ?? null,
-          price: price
-            ? {
-                id: price.id ?? null,
-                type: price.type ?? null,
-                unit_amount: price.unit_amount ?? null,
-              }
-            : null,
-          product: product
-            ? {
-                client_reference_id: product.client_reference_id ?? null,
-                id: product.id ?? null,
-                name: product.name ?? null,
-              }
-            : null,
-          quantity: it?.quantity ?? null,
-        };
-      })
-    : [];
+  const items = Array.isArray(rawItems) ?
+    rawItems.map((it: Record<string, unknown>) => {
+      const price = it?.price as Record<string, unknown> | undefined;
+      const product = it?.product as Record<string, unknown> | undefined;
+      return {
+        adjustable_quantity: it?.adjustable_quantity ?? null,
+        amount_subtotal: it?.amount_subtotal ?? null,
+        amount_total: it?.amount_total ?? null,
+        amount_unit: it?.amount_unit ?? null,
+        price: price ?
+          {
+            id: price.id ?? null,
+            type: price.type ?? null,
+            unit_amount: price.unit_amount ?? null,
+          } :
+          null,
+        product: product ?
+          {
+            client_reference_id: product.client_reference_id ?? null,
+            id: product.id ?? null,
+            name: product.name ?? null,
+          } :
+          null,
+        quantity: it?.quantity ?? null,
+      };
+    }) :
+    [];
 
   return {
     amount_subtotal: obj?.amount_subtotal ?? null,
