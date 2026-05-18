@@ -1,6 +1,5 @@
 // POST /api/byl/checkout
 // Thin proxy — бодит логик нь `bylCheckout` Cloud Function-д байна.
-// BYL_FUNCTIONS_BASE_URL env-ийг Cloud Function deploy хийсний дараа тохируулна.
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -8,7 +7,8 @@ export const dynamic = "force-dynamic";
 
 function getFnBase(): string {
   const base = process.env.BYL_FUNCTIONS_BASE_URL?.trim().replace(/\/$/, "");
-  if (!base) throw new Error("[byl] BYL_FUNCTIONS_BASE_URL env тохируулагдаагүй байна.");
+  if (!base)
+    throw new Error("[byl] BYL_FUNCTIONS_BASE_URL env тохируулагдаагүй байна.");
   return base;
 }
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     console.error("[api/byl/checkout proxy]", err);
     return NextResponse.json(
       { error: err?.message ?? "Checkout proxy алдаа." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

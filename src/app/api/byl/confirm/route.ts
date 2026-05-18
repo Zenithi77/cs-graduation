@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 
 function getFnBase(): string {
   const base = process.env.BYL_FUNCTIONS_BASE_URL?.trim().replace(/\/$/, "");
-  if (!base) throw new Error("[byl] BYL_FUNCTIONS_BASE_URL env тохируулагдаагүй байна.");
+  if (!base)
+    throw new Error("[byl] BYL_FUNCTIONS_BASE_URL env тохируулагдаагүй байна.");
   return base;
 }
 
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
     console.error("[api/byl/confirm proxy]", err);
     return NextResponse.json(
       { error: err?.message ?? "Confirm proxy алдаа." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
