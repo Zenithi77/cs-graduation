@@ -192,8 +192,6 @@ export default function FundPage() {
 
           {/* Below jar */}
           <div className="text-center mt-6 text-white/45 text-sm">
-            <span className="text-white/80 font-semibold">{supporterCount}</span>{" "}
-            хүн дэмжсэн ·{" "}
             <span className="text-[#f3d77a]">{Math.round(realFill * 100)}%</span>{" "}
             биелсэн
           </div>

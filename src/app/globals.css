@@ -1166,8 +1166,8 @@ main { position: relative; z-index: 1; }
 /* ===== Fund � Glass Jar ===== */
 .jar-stage {
   position: relative;
-  width: 360px;
-  height: 490px;
+  width: 540px;
+  height: 735px;
   max-width: 90vw;
   margin: 0 auto;
   filter: drop-shadow(0 30px 40px rgba(200,162,75,0.25)) drop-shadow(0 0 60px rgba(243,215,122,0.15));
