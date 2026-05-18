@@ -142,5 +142,636 @@
     "firstname": "Энэрэл",
     "lastname": "Энхбаяр",
     "password": "94209446"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Азжаргал",
+    "lastname": "Мөнхтуул",
+    "password": "99776705"
+  },
+
+  {
+    "class": "КУ-1",
+    "firstname": "Амарбуянт",
+    "lastname": "Амарбат",
+    "password": "99152156"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Баасангомбо",
+    "lastname": "Баяртогтох",
+    "password": "89999788"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Батзоригт",
+    "lastname": "Батбаяр",
+    "password": "89850554"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Баяржавхлан",
+    "lastname": "Даваадорж",
+    "password": "99930778"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Буянт-Оргил",
+    "lastname": "Төмөрчөдөр",
+    "password": "99644663"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Дүүрэнжаргал",
+    "lastname": "Ганбат",
+    "password": "89343568"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Есүгэ",
+    "lastname": "Зулбаяр",
+    "password": "95669229"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Лхамдулам",
+    "lastname": "Буманбаяр",
+    "password": "99453573"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Марал-Эрдэнэ",
+    "lastname": "Мөнхсүлд",
+    "password": "80443341"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Мишээл",
+    "lastname": "Барсболд",
+    "password": "89990955"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Мөнхбишрэл",
+    "lastname": "Энхтайван",
+    "password": "86802945"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Нандин",
+    "lastname": "Энхтөр",
+    "password": "88233030"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Намуун-Эрдэнэ",
+    "lastname": "Дүүсүмсанжаа",
+    "password": "89225008"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Онон",
+    "lastname": "Батболд",
+    "password": "95207350"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Сайханбилэг",
+    "lastname": "Баярсайхан",
+    "password": "89601058"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Түвшинтөр",
+    "lastname": "Хатанбаатар",
+    "password": "96653991"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Тэлмүүн",
+    "lastname": "Энх-Амгалан",
+    "password": "95789512"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Тэлмүүн",
+    "lastname": "Чинзориг",
+    "password": "80829983"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Тэлмэн",
+    "lastname": "Чинзориг",
+    "password": "89156236"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Тэмүгэ",
+    "lastname": "Золжаргал",
+    "password": "94249914"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Тэмүүлэн",
+    "lastname": "Батболд",
+    "password": "85901319"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Тэнүүн",
+    "lastname": "Мягмарсүрэн",
+    "password": "99151351"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Хангай",
+    "lastname": "Идэрсайхан",
+    "password": "94002098"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Цэгцүүн",
+    "lastname": "Батболд",
+    "password": "89185592"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Цэлмүүн",
+    "lastname": "Бямбасүрэн",
+    "password": "97087799"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Чингис",
+    "lastname": "Нямаа-Одсэр",
+    "password": "85199899"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Чингүүн",
+    "lastname": "Энх-Амар",
+    "password": "89067079"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Энгүүн",
+    "lastname": "Анхбаяр",
+    "password": "86958958"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Энхнар",
+    "lastname": "Энхтайван",
+    "password": "96011416"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Эрдэнэбилэг",
+    "lastname": "Батбилэг",
+    "password": "90029052"
+  },
+  {
+    "class": "КУ-1",
+    "firstname": "Эрхэс",
+    "lastname": "Батболд",
+    "password": "88507566"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Ариунбилэг",
+    "lastname": "Цэцэнтунгалаг",
+    "password": "99741239"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Ариунтамир",
+    "lastname": "Баатархүү",
+    "password": "95197775"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Баярсайхан",
+    "lastname": "Баатархүү",
+    "password": "95520443"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Билгүүн",
+    "lastname": "Гантуул",
+    "password": "99567700"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Буяндэлгэр",
+    "lastname": "Мягмаржав",
+    "password": "99983105"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Гарьд",
+    "lastname": "Энхбат",
+    "password": "95780913"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Жавхлан",
+    "lastname": "Ууганбаяр",
+    "password": "88691835"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Жамъянсүрэн",
+    "lastname": "Жамбалсүрэн",
+    "password": "80725670"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Мөнхсүлд",
+    "lastname": "Батамгалан",
+    "password": "88995468"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Очир-Эрдэнэ",
+    "lastname": "Эрдэнэямгар",
+    "password": "86686446"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Пүрэвдорж",
+    "lastname": "Энхтөр",
+    "password": "95562289"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Сүхболд",
+    "lastname": "Алтансүх",
+    "password": "99147433"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Сэргэлэн",
+    "lastname": "Батгэрэл",
+    "password": "99323923"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Цэлмэг",
+    "lastname": "Тамир",
+    "password": "94970947"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Эрхэс",
+    "lastname": "Оюунжаргал",
+    "password": "89657161"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Эрхэс",
+    "lastname": "Энхбаяр",
+    "password": "99127116"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Эрхэс",
+    "lastname": "Энхтөр",
+    "password": "88977779"
+  },
+  {
+    "class": "КУ-4",
+    "firstname": "Эсэн",
+    "lastname": "Чадраабал",
+    "password": "95954048"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Эрдэнэбаяр",
+    "lastname": "Бат-Эрдэнэ",
+    "password": "80213341"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Мягмарсүрэн",
+    "lastname": "Нямхүү",
+    "password": "94253450"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Тамир",
+    "lastname": "Үдэлгомбо",
+    "password": "89475188"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Мөнхтулга",
+    "lastname": "Мөнхдэлгэр",
+    "password": "99182597"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Ану",
+    "lastname": "Эрдэнэ",
+    "password": "99170142"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Мөнхдорж",
+    "lastname": "Мөнхсүлд",
+    "password": "88647746"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Баттүвшин",
+    "lastname": "Наранбаатар",
+    "password": "95272735"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Ганжигүүр",
+    "lastname": "Одбаяр",
+    "password": "95754559"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Анар",
+    "lastname": "Батцэнгэл",
+    "password": "95269792"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Дөлгөөн",
+    "lastname": "Золзаяа",
+    "password": "94845546"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Дөлгөөн",
+    "lastname": "Онолбаатар",
+    "password": "95877897"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Батсуурь",
+    "lastname": "Пүрэвсүрэн",
+    "password": "85588128"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Хангүнт",
+    "lastname": "Оюунбаатар",
+    "password": "88501591"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Билгүүнтүшиг",
+    "lastname": "Амарсайхан",
+    "password": "95291329"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Базаррагчаа",
+    "lastname": "Будрагчаа",
+    "password": "88460600"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Төгөлдөр",
+    "lastname": "Батсайхан",
+    "password": "99689168"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Зөнсод",
+    "lastname": "Бямбасүрэн",
+    "password": "94978049"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Урангоо",
+    "lastname": "Ариунбаатар",
+    "password": "94203115"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Содбадрах",
+    "lastname": "Долгорсүрэн",
+    "password": "94573019"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Батболд",
+    "lastname": "Отгонбаяр",
+    "password": "95704117"
+  },
+  {
+    "class": "КУ-5",
+    "firstname": "Молор",
+    "lastname": "Маргад-Эрдэнэ",
+    "password": "88290824"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Сүхбат",
+    "lastname": "Сумьяа",
+    "password": "94149177"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Тэмүүжин",
+    "lastname": "Шижир-Эрдэнэ",
+    "password": "88207036"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Түвшинзаяа",
+    "lastname": "Энхбаяр",
+    "password": "80688686"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Тэмүүжин",
+    "lastname": "Сосорбурам",
+    "password": "95584725"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Гүнбилэг",
+    "lastname": "Эрдэнэбилэг",
+    "password": "80598030"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Тэмүүжин",
+    "lastname": "Гянтболд",
+    "password": "99503789"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Цэцэн",
+    "lastname": "Чулуундорж",
+    "password": "90309057"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Өсөхбаяр",
+    "lastname": "Идэрцог",
+    "password": "83198888"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Мөнгөнсоёмбо",
+    "lastname": "Отгонбаяр",
+    "password": "90028299"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Баттөмөр",
+    "lastname": "Энхбат",
+    "password": "80237044"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Хишигсүрэн",
+    "lastname": "Дамдинсүрэн",
+    "password": "95009248"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Анар",
+    "lastname": "Цэнгэл",
+    "password": "99898900"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Энхдэлгэр",
+    "lastname": "Эрдэнэбилэг",
+    "password": "95124410"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Хосбаяр",
+    "lastname": "Ууганбаяр",
+    "password": "99223098"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Отгонбилэг",
+    "lastname": "Бумдэлгэр",
+    "password": "89447588"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Эрдэнэ",
+    "lastname": "Ганбат",
+    "password": "96984747"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Чингүн",
+    "lastname": "Бат-Энх",
+    "password": "95558748"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Ивээл",
+    "lastname": "Энхтөр",
+    "password": "80450131"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Төгөлдөр",
+    "lastname": "Дашрэнцэн",
+    "password": "99654406"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Цэцэнбилэг",
+    "lastname": "Алтангэрэл",
+    "password": "94491449"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Идэрхангай",
+    "lastname": "Батзориг",
+    "password": "99102491"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Санчирбаяр",
+    "lastname": "Наранбаатар",
+    "password": "95336789"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Мөнхбилэг",
+    "lastname": "Дамдисүрэн",
+    "password": "95152421"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Төгөлдөр",
+    "lastname": "Бүрэнтөгс",
+    "password": "89214262"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Хеделизе",
+    "lastname": "Алтанхуяг",
+    "password": "88965766"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Буяндарь",
+    "lastname": "Төмөрчөдөр",
+    "password": "99504686"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Бодьгэрэл",
+    "lastname": "Алтансүх",
+    "password": "96645053"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Сэргэлэнцогт",
+    "lastname": "Баасансүрэн",
+    "password": "89362071"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Энхбилэг",
+    "lastname": "Чинбат",
+    "password": "99548351"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Наранжаргал",
+    "lastname": "Сүхнасан",
+    "password": "88339291"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Өсөхбаяр",
+    "lastname": "Баттөмөр",
+    "password": "95237507"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Цэгц",
+    "lastname": "Тэмүүжин",
+    "password": "88055121"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Соёмбо",
+    "lastname": "Мөнхтөр",
+    "password": "94955189"
+  },
+  {
+    "class": "КУ-2",
+    "firstname": "Чинхүсэл",
+    "lastname": "Баасанбат",
+    "password": "85458263"
   }
 ]

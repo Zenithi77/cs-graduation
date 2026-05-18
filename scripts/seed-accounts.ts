@@ -6,11 +6,16 @@
  *   2. Copy scripts/accounts-data.example.json → scripts/accounts-data.json
  *      and fill in real names + passwords.
  *
- * Usage:
- *   npx ts-node --skipProject --esModuleInterop scripts/seed-accounts.ts
+ * Usage (PowerShell):
+ *   $env:TS_NODE_COMPILER_OPTIONS='{"module":"commonjs","esModuleInterop":true}'
+ *   npx ts-node --skipProject scripts/seed-accounts.ts            # all classes
+ *   npx ts-node --skipProject scripts/seed-accounts.ts "КУ-1"     # one class
  *
- * The script is idempotent: it skips accounts whose synthetic email already
- * exists in Firebase Auth and whose `accounts/{uid}` doc already exists.
+ * Idempotency: an account is skipped if EITHER (a) a Firestore
+ * `accounts` doc with the same class+firstname+lastname already exists,
+ * OR (b) the synthetic email is already registered in Firebase Auth.
+ * Check (a) protects against duplicates if the email-generation logic
+ * ever changes.
  */
 
 import * as fs from "fs";
@@ -24,12 +29,14 @@ import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
+import {
+  syntheticEmail,
+  AccountEntry as BaseAccountEntry,
+} from "./lib/synthetic-email";
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
-interface AccountEntry {
-  class: string; // e.g. "КУ-1"
-  firstname: string;
-  lastname: string;
+interface AccountEntry extends BaseAccountEntry {
   password: string;
 }
 
@@ -52,32 +59,6 @@ function initAdmin() {
       privateKey: parsed.private_key,
     }),
   });
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────
-
-/** Convert a Cyrillic/Unicode string to a lowercase ASCII-safe slug. */
-function slugify(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\-]/g, "x"); // non-ASCII → 'x' (deterministic)
-}
-
-/** Build the synthetic internal email for an account. */
-function syntheticEmail(entry: AccountEntry): string {
-  const classSlug =
-    entry.class
-      .toLowerCase()
-      .replace(/[^a-zа-я0-9]/g, "")
-      .replace(/[а-я]/g, (c) => c) || slugify(entry.class);
-  const clean = (s: string) => slugify(s).replace(/-/g, "");
-  // Keep it readable: ku1.bat.munkh@cs2026.internal
-  const prefix = entry.class
-    .replace("КУ-", "ku")
-    .replace("КУ", "ku")
-    .toLowerCase();
-  return `${prefix}.${clean(entry.firstname)}.${clean(entry.lastname)}@cs2026.internal`;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────
@@ -125,7 +106,26 @@ async function main() {
     const email = syntheticEmail(entry);
     const displayName = `${entry.firstname} ${entry.lastname}`;
 
-    // 1. Create Firebase Auth user (skip if already exists).
+    // 0. Skip if a Firestore `accounts` doc already exists for this
+    //    class+firstname+lastname (covers students seeded under an older
+    //    email-generation scheme, so we don't create duplicate Auth users).
+    const existingDoc = await db
+      .collection("accounts")
+      .where("class", "==", entry.class)
+      .where("firstname", "==", entry.firstname)
+      .where("lastname", "==", entry.lastname)
+      .limit(1)
+      .get();
+    if (!existingDoc.empty) {
+      const existingUid = existingDoc.docs[0].id;
+      console.log(
+        `  SKIP  ${displayName} (${entry.class}) — Firestore account doc already exists (uid: ${existingUid})`,
+      );
+      skipped++;
+      continue;
+    }
+
+    // 1. Create Firebase Auth user (skip if email is already registered).
     let uid: string;
     try {
       const existing = await adminAuth.getUserByEmail(email).catch(() => null);
