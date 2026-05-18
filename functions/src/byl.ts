@@ -105,7 +105,7 @@ export type BylWebhookEvent =
 export function verifyWebhookSignature(
   rawBody: string,
   signature: string | null | undefined,
-  secret: string
+  secret: string,
 ): boolean {
   if (!secret) throw new Error("[byl] BYL_WEBHOOK_SECRET not configured.");
   if (!signature) return false;
@@ -133,22 +133,22 @@ const DEFAULT_API_BASE = "https://byl.mn/api/v1";
 export async function createCheckout(
   input: CreateCheckoutInput,
   token: string,
-  projectId: string
+  projectId: string,
 ): Promise<{ data: { id: number; url: string } }> {
   const base = process.env.BYL_API_BASE ?? DEFAULT_API_BASE;
   const res = await fetch(`${base}/projects/${projectId}/checkouts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(input),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `[byl] createCheckout error (${res.status}): ${text.slice(0, 500)}`
+      `[byl] createCheckout error (${res.status}): ${text.slice(0, 500)}`,
     );
   }
   return res.json() as Promise<{ data: { id: number; url: string } }>;
@@ -164,11 +164,10 @@ export async function createCheckout(
 export async function getCheckout(
   checkoutId: string | number,
   token: string,
-  projectId: string
+  projectId: string,
 ): Promise<BylCheckoutObject> {
   const base = process.env.BYL_API_BASE ?? DEFAULT_API_BASE;
-  const url =
-    `${base}/projects/${projectId}/checkouts/${checkoutId}`;
+  const url = `${base}/projects/${projectId}/checkouts/${checkoutId}`;
   const res = await fetch(url, {
     method: "GET",
     headers: {
@@ -179,7 +178,7 @@ export async function getCheckout(
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `[byl] getCheckout error (${res.status}): ${text.slice(0, 500)}`
+      `[byl] getCheckout error (${res.status}): ${text.slice(0, 500)}`,
     );
   }
   const json = (await res.json()) as { data: BylCheckoutObject };
@@ -203,36 +202,36 @@ export function formatAmount(n: number): string {
  * @return {Record<string, unknown>} Sanitized object safe for Firestore.
  */
 export function sanitizeCheckoutRaw(
-  obj: Record<string, unknown>
+  obj: Record<string, unknown>,
 ): Record<string, unknown> {
   const rawItems = obj?.items;
-  const items = Array.isArray(rawItems) ?
-    rawItems.map((it: Record<string, unknown>) => {
-      const price = it?.price as Record<string, unknown> | undefined;
-      const product = it?.product as Record<string, unknown> | undefined;
-      return {
-        adjustable_quantity: it?.adjustable_quantity ?? null,
-        amount_subtotal: it?.amount_subtotal ?? null,
-        amount_total: it?.amount_total ?? null,
-        amount_unit: it?.amount_unit ?? null,
-        price: price ?
-          {
-            id: price.id ?? null,
-            type: price.type ?? null,
-            unit_amount: price.unit_amount ?? null,
-          } :
-          null,
-        product: product ?
-          {
-            client_reference_id: product.client_reference_id ?? null,
-            id: product.id ?? null,
-            name: product.name ?? null,
-          } :
-          null,
-        quantity: it?.quantity ?? null,
-      };
-    }) :
-    [];
+  const items = Array.isArray(rawItems)
+    ? rawItems.map((it: Record<string, unknown>) => {
+        const price = it?.price as Record<string, unknown> | undefined;
+        const product = it?.product as Record<string, unknown> | undefined;
+        return {
+          adjustable_quantity: it?.adjustable_quantity ?? null,
+          amount_subtotal: it?.amount_subtotal ?? null,
+          amount_total: it?.amount_total ?? null,
+          amount_unit: it?.amount_unit ?? null,
+          price: price
+            ? {
+                id: price.id ?? null,
+                type: price.type ?? null,
+                unit_amount: price.unit_amount ?? null,
+              }
+            : null,
+          product: product
+            ? {
+                client_reference_id: product.client_reference_id ?? null,
+                id: product.id ?? null,
+                name: product.name ?? null,
+              }
+            : null,
+          quantity: it?.quantity ?? null,
+        };
+      })
+    : [];
 
   return {
     amount_subtotal: obj?.amount_subtotal ?? null,

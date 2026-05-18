@@ -7,11 +7,11 @@
  * Secrets (Google Secret Manager-д урьдчилан үүсгэх):
  *   firebase functions:secrets:set BYL_WEBHOOK_SECRET
  */
-import {onRequest} from "firebase-functions/https";
-import {defineSecret} from "firebase-functions/params";
+import { onRequest } from "firebase-functions/https";
+import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
-import {initializeApp, getApps} from "firebase-admin/app";
-import {getFirestore, FieldValue} from "firebase-admin/firestore";
+import { initializeApp, getApps } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import {
   verifyWebhookSignature,
   sanitizeCheckoutRaw,
@@ -24,21 +24,21 @@ if (!getApps().length) initializeApp();
 const bylWebhookSecret = defineSecret("BYL_WEBHOOK_SECRET");
 
 export const bylWebhook = onRequest(
-  {secrets: [bylWebhookSecret]},
+  { secrets: [bylWebhookSecret] },
   async (req, res) => {
     if (req.method !== "POST") {
-      res.status(405).json({error: "Method not allowed."});
+      res.status(405).json({ error: "Method not allowed." });
       return;
     }
 
     // 1) Raw body авах — Express-ийн body parser автоматаар ажиллана
     //    Cloud Functions v2-д rawBody Buffer хэлбэрт байна.
     const rawBody: string =
-      typeof req.body === "string" ?
-        req.body :
-        Buffer.isBuffer(req.rawBody) ?
-          req.rawBody.toString("utf8") :
-          JSON.stringify(req.body);
+      typeof req.body === "string"
+        ? req.body
+        : Buffer.isBuffer(req.rawBody)
+          ? req.rawBody.toString("utf8")
+          : JSON.stringify(req.body);
 
     const signature = req.headers["byl-signature"] as string | undefined;
 
@@ -46,16 +46,18 @@ export const bylWebhook = onRequest(
     let valid = false;
     try {
       valid = verifyWebhookSignature(
-        rawBody, signature, bylWebhookSecret.value()
+        rawBody,
+        signature,
+        bylWebhookSecret.value(),
       );
     } catch (err) {
       logger.error("[bylWebhook] signature verify error", err);
-      res.status(500).json({error: "server misconfigured"});
+      res.status(500).json({ error: "server misconfigured" });
       return;
     }
     if (!valid) {
       logger.warn("[bylWebhook] invalid signature");
-      res.status(401).json({error: "invalid signature"});
+      res.status(401).json({ error: "invalid signature" });
       return;
     }
 
@@ -64,7 +66,7 @@ export const bylWebhook = onRequest(
     try {
       event = JSON.parse(rawBody);
     } catch {
-      res.status(400).json({error: "invalid json"});
+      res.status(400).json({ error: "invalid json" });
       return;
     }
 
@@ -74,13 +76,13 @@ export const bylWebhook = onRequest(
       const eventType = (event as any).type ?? "unknown";
 
       // Idempotency
-      const eventRef = eventId ?
-        db.collection("processed_webhook_events").doc(eventId) :
-        null;
+      const eventRef = eventId
+        ? db.collection("processed_webhook_events").doc(eventId)
+        : null;
       if (eventRef) {
         const snap = await eventRef.get();
         if (snap.exists) {
-          res.json({ok: true, duplicate: true});
+          res.json({ ok: true, duplicate: true });
           return;
         }
       }
@@ -100,7 +102,7 @@ export const bylWebhook = onRequest(
         batch.set(paymentRef, {
           amount: formatAmount(amountNum),
           checkoutRaw: sanitizeCheckoutRaw(
-            obj as unknown as Record<string, unknown>
+            obj as unknown as Record<string, unknown>,
           ),
           checkout_id: obj.id,
           client_reference_id: uid,
@@ -116,16 +118,14 @@ export const bylWebhook = onRequest(
           });
         }
         await batch.commit();
-        logger.info("[bylWebhook] checkout.completed saved", {checkoutId});
-        res.json({ok: true});
+        logger.info("[bylWebhook] checkout.completed saved", { checkoutId });
+        res.json({ ok: true });
         return;
       }
 
       if (event.type === "invoice.paid") {
         const obj = event.data.object;
-        const paymentRef = db
-          .collection("payments")
-          .doc(`invoice_${obj.id}`);
+        const paymentRef = db.collection("payments").doc(`invoice_${obj.id}`);
         const amountNum = Number(obj.amount) || 0;
         const isPaid = obj.status === "paid";
 
@@ -133,7 +133,7 @@ export const bylWebhook = onRequest(
         batch.set(paymentRef, {
           amount: formatAmount(amountNum),
           checkoutRaw: sanitizeCheckoutRaw(
-            obj as unknown as Record<string, unknown>
+            obj as unknown as Record<string, unknown>,
           ),
           checkout_id: obj.id,
           client_reference_id: obj.client_reference_id || null,
@@ -149,8 +149,8 @@ export const bylWebhook = onRequest(
           });
         }
         await batch.commit();
-        logger.info("[bylWebhook] invoice.paid saved", {invoiceId: obj.id});
-        res.json({ok: true});
+        logger.info("[bylWebhook] invoice.paid saved", { invoiceId: obj.id });
+        res.json({ ok: true });
         return;
       }
 
@@ -161,10 +161,12 @@ export const bylWebhook = onRequest(
           processedAt: FieldValue.serverTimestamp(),
         });
       }
-      res.json({ok: true, ignored: true});
+      res.json({ ok: true, ignored: true });
     } catch (err: unknown) {
       logger.error("[bylWebhook] handler error", err);
-      res.status(500).json({error: (err as Error)?.message ?? "handler error"});
+      res
+        .status(500)
+        .json({ error: (err as Error)?.message ?? "handler error" });
     }
-  }
+  },
 );
