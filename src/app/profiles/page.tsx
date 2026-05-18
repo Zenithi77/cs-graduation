@@ -17,7 +17,11 @@ export default function ProfilesPage() {
 
   useEffect(() => {
     (async () => {
-      const q = query(collection(db, "users"), where("isGraduate", "==", true));
+      const q = query(
+        collection(db, "users"),
+        where("isGraduate", "==", true),
+        where("class", "==", "КУ-5"),
+      );
       const snap = await getDocs(q);
       setGrads(snap.docs.map((d) => d.data() as Grad));
       setLoading(false);

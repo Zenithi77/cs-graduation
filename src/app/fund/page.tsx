@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { Sparkles, AlertCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { collection, doc, onSnapshot, query } from "firebase/firestore";
+import { Sparkles, AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth";
+import { FUND_FEE } from "@/lib/constants";
 
 type Donation = {
   id: string;
@@ -42,13 +44,15 @@ function useCountUp(target: number, duration = 1400) {
 }
 
 const GOAL = 1_620_000;
-const FEE = 15_000;
+const FEE = FUND_FEE;
 
 export default function FundPage() {
   const { user } = useAuth();
   const [donations, setDonations] = useState<Donation[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [myTotal, setMyTotal] = useState<number | null>(null);
+  const [myLastAt, setMyLastAt] = useState<any>(null);
 
   useEffect(() => {
     const q = query(collection(db, "donations"));
@@ -60,6 +64,27 @@ export default function FundPage() {
     return () => unsub();
   }, []);
 
+  // Хэрэглэгчийн нийт төлсөн дүнг бодит цагт авах.
+  useEffect(() => {
+    if (!user) {
+      setMyTotal(null);
+      setMyLastAt(null);
+      return;
+    }
+    const unsub = onSnapshot(
+      doc(db, "users", user.uid),
+      (s) => {
+        const data = s.data() as any;
+        setMyTotal(Number(data?.totalDonated) || 0);
+        setMyLastAt(data?.lastDonatedAt || null);
+      },
+      (err) => console.warn("[fund] user snapshot:", err)
+    );
+    return () => unsub();
+  }, [user]);
+
+  const hasPaid = !!user && (myTotal ?? 0) >= FEE;
+
   const total = useMemo(
     () => donations.reduce((s, d) => s + (Number(d.amount) || 0), 0),
     [donations]
@@ -68,8 +93,9 @@ export default function FundPage() {
 
   // Жинхэнэ хураамжийн түвшин (0-1)
   const realFill = Math.min(1, total / GOAL);
-  // Төлбөр товч дээр зогсож байгаа үед урьдчилан харах (нэвтэрсэн бол)
-  const preview = user ? Math.min(1, (total + FEE) / GOAL) : null;
+  // Төлбөр товч дээр зогсож байгаа үед урьдчилан харах (нэвтэрсэн ба төлөөгүй бол)
+  const preview =
+    user && !hasPaid ? Math.min(1, (total + FEE) / GOAL) : null;
   const displayFill = preview ?? realFill;
 
   // Шингэний түвшин (jar internal coords: 100..340 = 240 units tall)
@@ -152,62 +178,157 @@ export default function FundPage() {
           </div>
         </div>
 
-        {/* Donate form */}
-        <form onSubmit={submit} className="mt-12 max-w-md mx-auto space-y-4">
-          {/* Fixed fee display */}
-          <div className="text-center">
-            <div className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">
-              Нэг хүний хураамж
+        {/* Paid state — already paid users see a confirmation panel */}
+        {hasPaid ? (
+          <PaidPanel total={myTotal ?? 0} lastAt={myLastAt} />
+        ) : (
+          /* Donate form */
+          <form onSubmit={submit} className="mt-12 max-w-md mx-auto space-y-4">
+            {/* Fixed fee display */}
+            <div className="text-center">
+              <div className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">
+                Нэг хүний хураамж
+              </div>
+              <div className="inline-flex items-baseline gap-2 rounded-2xl border border-[#f3d77a]/30 bg-white/[0.03] px-8 py-5 backdrop-blur">
+                <span className="font-display text-5xl md:text-6xl gold-text leading-none">
+                  {FEE.toLocaleString()}
+                </span>
+                <span className="text-white/60 text-2xl font-display">₮</span>
+              </div>
             </div>
-            <div className="inline-flex items-baseline gap-2 rounded-2xl border border-[#f3d77a]/30 bg-white/[0.03] px-8 py-5 backdrop-blur">
-              <span className="font-display text-5xl md:text-6xl gold-text leading-none">
-                {FEE.toLocaleString()}
-              </span>
-              <span className="text-white/60 text-2xl font-display">₮</span>
-            </div>
+
+            {!user && (
+              <div className="flex items-start gap-2 text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-200 p-3.5">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>
+                  Төлбөр хийхийн тулд эхлээд{" "}
+                  <a href="/login" className="underline font-semibold">
+                    нэвтэрнэ үү
+                  </a>
+                  .
+                </span>
+              </div>
+            )}
+
+            {error && (
+              <div className="flex items-start gap-2 text-sm rounded-xl border border-red-500/30 bg-red-500/10 text-red-200 p-3.5">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={busy || !user}
+              className="fund-pay-btn w-full"
+            >
+              {busy ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Шилжүүлж байна...
+                </span>
+              ) : (
+                "Хураамж төлөх"
+              )}
+            </button>
+
+            <p className="text-center text-xs text-white/35">
+              Төлбөрийг{" "}
+              <span className="text-[#f3d77a]/80">byl.mn</span>
+              -ээр найдвартай дамжуулна
+            </p>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────── Paid panel ─────────────── */
+function PaidPanel({
+  total,
+  lastAt,
+}: {
+  total: number;
+  lastAt: any;
+}) {
+  const date: Date | null = lastAt?.toDate
+    ? lastAt.toDate()
+    : lastAt
+    ? new Date(lastAt)
+    : null;
+  const dateLabel = date
+    ? date.toLocaleDateString("mn-MN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  return (
+    <div className="mt-12 max-w-md mx-auto">
+      <div className="relative rounded-2xl border border-[#f3d77a]/40 bg-white/[0.04] backdrop-blur p-7 text-center overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 0%, rgba(243,215,122,0.18), transparent 60%)",
+          }}
+        />
+        <div className="relative">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-full"
+            style={{
+              background: "linear-gradient(135deg, #f3d77a, #C8A24B)",
+              boxShadow:
+                "0 0 30px rgba(243,215,122,0.4), inset 0 -3px 8px rgba(0,0,0,0.2)",
+            }}
+          >
+            <CheckCircle2
+              className="w-9 h-9 text-[#1B1B1B]"
+              strokeWidth={2.5}
+            />
           </div>
 
-          {!user && (
-            <div className="flex items-start gap-2 text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-200 p-3.5">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>
-                Төлбөр хийхийн тулд эхлээд{" "}
-                <a href="/login" className="underline font-semibold">
-                  нэвтэрнэ үү
-                </a>
-                .
-              </span>
-            </div>
+          <div className="text-[11px] uppercase tracking-[0.35em] text-[#f3d77a]/80 mt-5">
+            Та хураамжаа төлсөн
+          </div>
+          <div className="font-display text-3xl text-white mt-2">
+            Баярлалаа 🎉
+          </div>
+
+          <div className="mt-6 inline-flex items-baseline gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3">
+            <span className="text-white/50 text-xs uppercase tracking-[0.25em]">
+              Нийт
+            </span>
+            <span className="font-display text-2xl gold-text">
+              {total.toLocaleString()}
+            </span>
+            <span className="text-white/60 text-base font-display">₮</span>
+          </div>
+
+          {dateLabel && (
+            <p className="text-xs text-white/40 mt-4">
+              Сүүлд төлсөн: {dateLabel}
+            </p>
           )}
 
-          {error && (
-            <div className="flex items-start gap-2 text-sm rounded-xl border border-red-500/30 bg-red-500/10 text-red-200 p-3.5">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={busy || !user}
-            className="fund-pay-btn w-full"
-          >
-            {busy ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Шилжүүлж байна...
-              </span>
-            ) : (
-              "Хураамж төлөх"
-            )}
-          </button>
-
-          <p className="text-center text-xs text-white/35">
-            Төлбөрийг{" "}
-            <span className="text-[#f3d77a]/80">byl.mn</span>
-            -ээр найдвартай дамжуулна
-          </p>
-        </form>
+          <div className="mt-7 flex flex-col sm:flex-row gap-2 justify-center">
+            <Link
+              href="/profiles"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-white/15 text-white/80 hover:bg-white/5 hover:text-white transition text-sm"
+            >
+              Төгсөгчид рүү
+            </Link>
+            <Link
+              href="/"
+              className="fund-pay-btn !w-auto !px-8 inline-flex items-center justify-center"
+            >
+              Нүүр хуудас
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
