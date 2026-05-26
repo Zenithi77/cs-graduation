@@ -82,6 +82,7 @@ export default function ProfilePage() {
   const onPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || user.uid !== uid) return;
     const file = e.target.files?.[0]; if (!file) return;
+    e.target.value = "";
     setUploading(true);
     try {
       const { secure_url: url } = await uploadToCloudinary(file, {
@@ -90,6 +91,9 @@ export default function ProfilePage() {
       });
       await updateDoc(doc(db, "users", uid), { photoURL: url });
       setP((prev) => prev ? { ...prev, photoURL: url } : prev);
+    } catch (err) {
+      console.error("[profile] photo upload failed:", err);
+      alert("Зураг илгээхэд алдаа гарлаа. Дахин оролдоно уу.");
     } finally { setUploading(false); }
   };
 
@@ -103,7 +107,7 @@ export default function ProfilePage() {
           <div className="aspect-square w-56 bg-gradient-to-br from-cream to-gold/20 overflow-hidden flex items-center justify-center">
             {p.photoURL ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={p.photoURL} alt={p.displayName} className="w-full h-full object-cover" />
+              <img key={p.photoURL} src={p.photoURL} alt={p.displayName} className="w-full h-full object-cover" />
             ) : (
               <span className="font-display text-7xl text-ink/40">{(p.displayName || "?").charAt(0)}</span>
             )}
