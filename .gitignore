@@ -1,4 +1,6 @@
 node_modules
+images
+images-compressed
 .next
 out
 .env.local
