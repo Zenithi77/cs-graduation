@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import confetti from "canvas-confetti";
 
 type Grad = {
   uid: string;
@@ -14,6 +15,26 @@ type Grad = {
 export default function ProfilesPage() {
   const [grads, setGrads] = useState<Grad[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Left cannon
+    confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0, y: 0.65 } });
+    // Right cannon
+    confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.65 } });
+
+    // Second wave after short delay
+    const t1 = setTimeout(() => {
+      confetti({ particleCount: 60, angle: 70, spread: 60, origin: { x: 0.1, y: 0.6 } });
+      confetti({ particleCount: 60, angle: 110, spread: 60, origin: { x: 0.9, y: 0.6 } });
+    }, 350);
+
+    // Center burst finale
+    const t2 = setTimeout(() => {
+      confetti({ particleCount: 100, spread: 120, origin: { x: 0.5, y: 0.55 }, scalar: 1.1 });
+    }, 700);
+
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -43,24 +64,32 @@ export default function ProfilesPage() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {grads.map((g, i) => (
-            <Link key={g.uid} href={`/profiles/${g.uid}`} className="block">
-              <div
-                className="frame-polaroid"
-                style={{ ["--rot" as any]: `${(i % 5) - 2}deg` }}
-              >
-                <div className="aspect-square bg-gradient-to-br from-cream to-gold/20 flex items-center justify-center overflow-hidden">
-                  {g.photoURL ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={g.photoURL} alt={g.displayName} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="font-display text-5xl text-ink/40">
-                      {(g.displayName || "?").charAt(0)}
-                    </span>
-                  )}
+            <div key={g.uid} className="flex flex-col items-center gap-3">
+              <Link href={`/profiles/${g.uid}`} className="block">
+                <div
+                  className="frame-polaroid"
+                  style={{ ["--rot" as any]: `${(i % 5) - 2}deg` }}
+                >
+                  <div className="aspect-square bg-gradient-to-br from-cream to-gold/20 flex items-center justify-center overflow-hidden">
+                    {g.photoURL ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={g.photoURL} alt={g.displayName} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="font-display text-5xl text-ink/40">
+                        {(g.displayName || "?").charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-center font-display mt-3 text-lg">{g.displayName}</div>
                 </div>
-                <div className="text-center font-display mt-3 text-lg">{g.displayName}</div>
-              </div>
-            </Link>
+              </Link>
+              <Link
+                href={`/profiles/${g.uid}#messages`}
+                className="btn btn-gold btn-lure text-xs px-4 py-2 w-full text-center"
+              >
+                Сэтгэгдэл бичих
+              </Link>
+            </div>
           ))}
         </div>
       )}

@@ -78,6 +78,20 @@ body::before {
 .btn-primary:hover { background: #7A1F2B; }
 .btn-gold { background: #C8A24B; color: #1B1B1B; }
 .btn-gold:hover { filter: brightness(1.05); }
+
+@keyframes lure {
+  0%, 100% { transform: scale(1) rotate(0deg);    box-shadow: 0 4px 14px rgba(200,162,75,0.35); }
+  10%      { transform: scale(1.07) rotate(-2deg); box-shadow: 0 8px 28px rgba(200,162,75,0.65); }
+  20%      { transform: scale(1.07) rotate(2deg);  box-shadow: 0 8px 28px rgba(200,162,75,0.65); }
+  30%      { transform: scale(1.04) rotate(-1deg); box-shadow: 0 6px 20px rgba(200,162,75,0.5);  }
+  40%      { transform: scale(1.04) rotate(0deg);  box-shadow: 0 6px 20px rgba(200,162,75,0.5);  }
+  55%      { transform: scale(1) rotate(0deg);    box-shadow: 0 4px 14px rgba(200,162,75,0.35); }
+}
+.btn-lure {
+  animation: lure 2.2s ease-in-out infinite;
+  animation-delay: 1s;
+}
+.btn-lure:hover { animation-play-state: paused; filter: brightness(1.08); }
 .btn-ghost { border: 1px solid rgba(0,0,0,0.2); }
 .btn-ghost:hover { background: rgba(0,0,0,0.05); }
 

@@ -7,8 +7,7 @@ import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Нүүр" },
-  { href: "/profiles", label: "Төгсөгчид" },
-  { href: "/fund", label: "Хураамж" },
+  { href: "/profiles", label: "Сэтгэгдэл үлдээх" },
   { href: "/photos", label: "Зургийн булан" },
   { href: "/logos", label: "Лого сонголт" },
 ];

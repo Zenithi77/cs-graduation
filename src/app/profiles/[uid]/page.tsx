@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import confetti from "canvas-confetti";
 import {
   doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp,
   updateDoc,
@@ -34,6 +35,10 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("");
   const [name, setName] = useState("");
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
+  }, []);
 
   useEffect(() => {
     if (!uid) return;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HandCoins, Camera, Shirt, ChevronDown, type LucideIcon } from "lucide-react";
+import { Camera, Shirt, MessageCircle, ChevronDown, type LucideIcon } from "lucide-react";
 import Countdown from "@/components/Countdown";
 
 const sections: {
@@ -9,10 +9,10 @@ const sections: {
   Icon: LucideIcon;
 }[] = [
   {
-    href: "/fund",
-    title: "Хураамж",
-    sub: "1–4-р курсынхний 5-р курсын төгсөлтөд төлөх хураамжийн бүртгэл",
-    Icon: HandCoins,
+    href: "/profiles",
+    title: "Сэтгэгдэл бичих",
+    sub: "Төгсөгч бүрт сэтгэгдэл үлдээх боломжтой. Нэр дээр нь дарж орно уу.",
+    Icon: MessageCircle,
   },
   {
     href: "/photos",
@@ -23,7 +23,7 @@ const sections: {
   {
     href: "/logos",
     title: "Лого сонголт",
-    sub: "Футболкан дээр тавих логогоо санал асуулгаар сонгоё",
+    sub: "Футболкан дээр тавих лogogоо санал асуулгаар сонгоё",
     Icon: Shirt,
   },
 ];
@@ -51,9 +51,8 @@ export default function Home() {
           </div>
 
           <div className="mt-10 flex justify-center gap-3 flex-wrap">
-            <Link href="/profiles" className="btn btn-primary">Төгсөгчид</Link>
-            <Link href="/fund" className="btn btn-gold">Хураамж төлөх</Link>
-            <Link href="/logos" className="btn btn-ghost">Лого санал өгөх</Link>
+            <Link href="/profiles" className="btn btn-primary">Сэтгэгдэл үлдээх</Link>
+<Link href="/logos" className="btn btn-ghost">Лого санал өгөх</Link>
           </div>
         </div>
 
